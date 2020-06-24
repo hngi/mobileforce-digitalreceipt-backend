@@ -37,14 +37,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
     'authapp',
     'userManagement',
     'customers',
+    'googlelogin',
     'businessManagement.apps.BusinessmanagementConfig',
     'djoser',
     'push_notifications',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'digitalReceipt.middleware.authMiddleWare.AuthorizationMiddleware',
+    #'digitalReceipt.middleware.authMiddleWare.AuthorizationMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -97,10 +103,11 @@ DATABASES = {
 }
 }
 
+
 import dj_database_url
 
 db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
-DATABASES['default'].update(db_from_env) 
+DATABASES['default'].update(db_from_env)
 #dj_database_url.config(default='postgres://...'}
 
 REST_FRAMEWORK = {
@@ -164,3 +171,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "live-static-files", "media-root")
 # No security issues occur in email the given password here is an app password
 email_address = 'hngdigitalreceipt@gmail.com'
 email_app_password = 'hosebgyqtuckqqkt'
+
+#Authentication backend (google Facebook and apple)
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+SITE_ID = 1
+LOGIN_REDIRECT_URL = 'logged/'

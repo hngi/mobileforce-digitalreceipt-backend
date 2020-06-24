@@ -8,7 +8,6 @@ router.register(r'customers', views.indexViewSet)
 
 urlpatterns = [
 	path('', include(router.urls)),
-	path('new_customer/', customer),
 	path('customers-auth', include('rest_framework.urls', namespace = 'rest_framework')),
 	path('customer/<int:id>/', views.single),
 	path('register', create_customer),

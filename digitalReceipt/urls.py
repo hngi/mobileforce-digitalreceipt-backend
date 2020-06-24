@@ -17,17 +17,20 @@ from django.contrib import admin
 from django.urls import path, include
 #from .router import router
 from rest_framework.authtoken import views
-
+from django.views.generic import TemplateView
 from .cron.notification import start
 from .views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('checkserver/',index, name='index' ),
     path('auth/', include('authapp.urls')),
     path('v1/user/', include('userManagement.urls')),
     path('v1/business/', include('businessManagement.urls')),
     path('v1/customer/', include('customers.urls')),
+    path('google/', TemplateView.as_view(template_name = 'login/index.html')),
+    path('accounts/google/login/callback/logged/', TemplateView.as_view(template_name = 'login/loged.html')),
 ]
 
 start()

@@ -14,7 +14,7 @@ class AuthorizationMiddleware(object):
     def __call__(self, request):
 
         jwtEscapeUrls = ['/v1/user/otp_register','/v1/user/change_password','/v1/user/email/exists',
-                         '/v1/user/register','/v1/user/login','admin/','customers-auth/','customer/<int:id>/','customers/']
+                         '/v1/user/register','/v1/user/login','admin']
         print(request.path)
         print(request.path in jwtEscapeUrls)
         if request.path in jwtEscapeUrls:
@@ -36,5 +36,5 @@ class AuthorizationMiddleware(object):
                 except Exception as error:
                     return HttpResponseForbidden(error)
             else:
-                return HttpResponseForbidden("Login")
+                return HttpResponseForbidden("Non-exposed endpoint, Please Login First")
 

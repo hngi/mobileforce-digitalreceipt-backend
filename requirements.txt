@@ -1,7 +1,6 @@
 dj-database-url==0.5.0
 Django==3.0.7
 django-filter==2.3.0
-django-heroku==0.3.1
 djangorestframework==3.11.0
 djangorestframework-jwt==1.11.0
 djoser==2.0.3
@@ -12,11 +11,9 @@ pylint==2.5.2
 webencodings==0.5.1
 whitenoise==5.1.0
 gunicorn
-django-heroku
-djangorestframework
-djoser
 PyJwt
 django-push-notifications
 django_cron
 apscheduler
 django-environ
+django-allauth

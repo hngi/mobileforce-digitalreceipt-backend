@@ -36,7 +36,7 @@ def notificationsJob():
 def start():
     scheduler = BackgroundScheduler()
     trigger = OrTrigger([
-        CronTrigger(hour='8', minute='32-59'),
+        CronTrigger(hour='23', minute='58-59'),
     ])
     # scheduler.add_job(notificationsJob, 'interval', minutes=30)
     scheduler.add_job(notificationsJob, trigger)
