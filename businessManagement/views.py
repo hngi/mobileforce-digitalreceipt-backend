@@ -95,36 +95,3 @@ def get_all_receipt(request):
         except Exception as error:
             return JsonResponse({
                 "message": error}, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET'])
-def get_all_draft_receipt(request):
-    # send the receipt id
-    if request.method == 'GET':
-        try:
-            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False)
-            if draftReceipt:
-                user = User.objects.get(id=request.user_id)
-                userData = UserSerializer(user, many=False).data
-                draftReceipts = ReceiptSerializer(draftReceipt, many=True).data
-                for data in draftReceipts:
-                    data['user'] = {
-                        'id': userData['id'],
-                        'name': userData['name'],
-                        'email_address': userData['email_address']
-                    }
-                    products = Products.objects.filter(receipt=data['id'])
-                    products_data = ProductSerializer(products, many=True).data
-                    data['products'] = products_data
-                    print(data['products'])
-                    customer = CustomerDetails.objects.get(pk=data['customer'])
-                    data['customer'] = CustomersSerializer(customer, many=False).data
-                    data['total'] = sum(c['unit_price'] *c['quantity'] for c in data['products'])
-                return JsonResponse({
-                    "message": "Retreived all drafted receipts",
-                    "data": draftReceipts}, status=status.HTTP_200_OK)
-            else:
-                return JsonResponse({
-                    "message": "There are no draft receipts created"}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as error:
-            return JsonResponse({
-                "message": error}, status=status.HTTP_400_BAD_REQUEST)

@@ -21,3 +21,4 @@ fcm_django
 django-allauth
 drf-yasg
 requests
+django-rest-framework-social-oauth2

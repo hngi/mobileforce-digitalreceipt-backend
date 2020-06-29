@@ -24,6 +24,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from oauthlogin import views
+from django.conf import settings
 
 
 schema_view = get_schema_view(
@@ -49,6 +50,8 @@ urlpatterns = [
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('hello/', views.HelloView.as_view(), name='hello'),
     path('google', views.GoogleView.as_view(), name='google'),
+    #path('auth/', include('rest_framework_social_oauth2.urls')),
+    path('auth/', include('rest_framework_social_oauth2.urls'))
 ]
 
 start()
