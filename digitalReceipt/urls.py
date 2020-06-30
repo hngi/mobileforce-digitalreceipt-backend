@@ -13,11 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 #from .router import router
 from rest_framework.authtoken import views
 from django.views.generic import TemplateView
+
+from . import settings
 from .cron.notification import start
 from .views import index
 from rest_framework import permissions
@@ -50,5 +53,8 @@ urlpatterns = [
     path('hello/', views.HelloView.as_view(), name='hello'),
     path('google', views.GoogleView.as_view(), name='google'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 start()
