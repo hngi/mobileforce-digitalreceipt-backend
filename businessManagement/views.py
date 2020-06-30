@@ -275,7 +275,7 @@ def get_business(request):
             bus = BusinessInfo.objects.all().order_by('name')
             business = BusinessInfoSerializer(bus, many=True)
             return JsonResponse({
-                'data': business
+                'data': business.data
             }, status=status.HTTP_200_OK)
         except BusinessInfo.DoesNotExist:
             return JsonResponse({
