@@ -11,7 +11,12 @@ from userManagement.models import User
 
 def user_directory_path(instance, filename):
     img_extension = filename.split('.')[1]
-    return 'receipts/{0}.{1}'.format(instance.id,img_extension)
+    return 'receipts/{0}.{1}'.format(instance.id, img_extension)
+
+
+def logo_directory_path(instance, filename):
+    img_extension = filename.split('.')[1]
+    return 'logos/{0}.{1}'.format(instance.id, img_extension)
 
 
 class Receipts(models.Model):
@@ -29,7 +34,7 @@ class Receipts(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     issued = models.BooleanField(null=True, default=False)
     deleted = models.BooleanField(null=True, default=False)
-    signature = models.FileField(null=True,upload_to=user_directory_path)
+    signature = models.FileField(null=True, upload_to=user_directory_path)
     partPayment = models.BooleanField(null=True, default=False)
     partPaymentDateTime = models.DateTimeField(null=True, default=datetime.now)
     customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=False)
@@ -54,3 +59,13 @@ class Notifications(models.Model):
     date_to_deliver = models.DateField(null=True, max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class BusinessInfo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(null=False, unique=True, max_length=150)
+    phone_number = models.CharField(max_length=50, null=False)
+    address = models.CharField(max_length=200, null=False)
+    slogan = models.CharField(max_length=50)
+    logo = models.FileField(null=True, upload_to=logo_directory_path)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -80,7 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.core.context_processors.static',
+                # 'django.core.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -98,10 +98,10 @@ WSGI_APPLICATION = 'digitalReceipt.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
+        'NAME': 'd6759nm1lpbtmm',
+        'USER': 'lxvylcgkrunnuy',
+        'PASSWORD': '3ffc69d388c478965610772cc76ee8586965bca6863c167f3080e30bfcd3ce21',
+        'HOST': 'ec2-52-202-66-191.compute-1.amazonaws.com',
         'PORT': '5432',
 }
 }

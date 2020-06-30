@@ -13,8 +13,8 @@ from customers.models import CustomerDetails
 from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
-from .models import Receipts, Products
-from .serializers import ReceiptSerializer, ProductSerializer
+from .models import Receipts, Products, BusinessInfo
+from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer
 
 
 def add_one_to_receipt_number(user):
@@ -27,7 +27,7 @@ def add_one_to_receipt_number(user):
     )
     print(largest)
     if not largest:
-        return 'R-'+str(1)
+        return 'R-' + str(1)
     return "R-" + str(largest + 1)
 
 
@@ -170,7 +170,7 @@ def customize_receipt(request):
         try:
             customerData = request.data["customer"]
             customerData['user'] = request.user_id
-        
+
             customerSerializer = CustomersSerializer(data=customerData)
 
             receiptData = request.data['receipt']
@@ -247,4 +247,41 @@ def upload_receipt_signature(request):
         except Receipts.DoesNotExist:
             return JsonResponse({
                 'error': "Receipts Does not exist"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def create_business(request):
+    if request.method == 'POST':
+        data = {
+            'name': request.data['name'],
+            'phone_number': request.data['phone_number'],
+            'address': request.data['address'],
+            'slogan': request.data['slogan'],
+            'logo': request.FILES['logo'],
+            'user':request.user_id
+        }
+        serializer = BusinessInfoSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_business(request):
+    if request.method == 'GET':
+        try:
+            bus = BusinessInfo.objects.all().order_by('name')
+            business = BusinessInfoSerializer(bus, many=True)
+            return JsonResponse({
+                'data': business
+            }, status=status.HTTP_200_OK)
+        except BusinessInfo.DoesNotExist:
+            return JsonResponse({
+                'error': 'No Business created yet'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as error:
+            return JsonResponse({
+                'error': error
             }, status=status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Receipts, Products, Notifications
+from .models import Receipts, Products, Notifications, BusinessInfo
 
 
 # class BusinessSerializer(serializers.ModelSerializer):
@@ -25,3 +25,8 @@ class NotificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notifications
         fields = '__all__'
+
+class BusinessInfoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = BusinessInfo
+		fields = '__all__'
