@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com']
+ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com','degeit-receipt.herokuapp.com']
 
 
 # Application definition
