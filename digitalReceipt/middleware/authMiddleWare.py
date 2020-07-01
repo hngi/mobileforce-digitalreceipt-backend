@@ -31,8 +31,10 @@ class AuthorizationMiddleware(object):
                         try:
                             user = User.objects.get(id=request.user_id)
                             response = self.get_response(request)
+                            print(request.user_id)
                             return response
                         except User.doesNotExist:
+                            print("user does not exist")
                             return JsonResponse({"error": "Invalid session.Please login"},
                                                 status=status.HTTP_401_UNAUTHORIZED)
                     else:
