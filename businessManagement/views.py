@@ -285,3 +285,43 @@ def get_business(request):
             return JsonResponse({
                 'error': error
             }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def get_receipt_id(request):
+    # send the receipt id
+    if request.method == "GET":
+        try:
+            receipt = Receipts.objects.filter(id=request.query_params.get('receiptId'))
+            if receipt:
+                user = User.objects.get(id=request.user_id)
+                userData = UserSerializer(user, many=False).data
+                draftReceipts = ReceiptSerializer(receipt, many=True).data
+                for data in draftReceipts:
+                    data["user"] = {
+                        "id": userData["id"],
+                        "name": userData["name"],
+                        "email_address": userData["email_address"],
+                    }
+                    products = Products.objects.filter(receipt=data["id"])
+                    products_data = ProductSerializer(products, many=True).data
+                    data["products"] = products_data
+                    print(data["products"])
+                    customer = CustomerDetails.objects.get(pk=data["customer"])
+                    data["customer"] = CustomersSerializer(customer, many=False).data
+                    data["total"] = sum(
+                        c["unit_price"] * c["quantity"] for c in data["products"]
+                    )
+                return JsonResponse(
+                    {
+                        "message": "Retreived all drafted receipts",
+                        "data": draftReceipts,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return JsonResponse(
+                    {"message": "There are no draft receipts created"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as error:
+            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
