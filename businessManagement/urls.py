@@ -20,5 +20,7 @@ urlpatterns = [
     path("receipt/upload/signature", upload_receipt_signature),
     path('info/create', create_business),
     path('info/all', get_business),
-    path('info/<id>/update', update_business)
+    path('info/<id>/update', update_business),
+    path("receipt/one", get_receipt_id),
+
 ]
