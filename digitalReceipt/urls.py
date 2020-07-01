@@ -54,6 +54,7 @@ urlpatterns = [
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('hello/', views.HelloView.as_view(), name='hello'),
     path('google', views.GoogleView.as_view(), name='google'),
+    path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

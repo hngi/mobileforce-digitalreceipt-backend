@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'userManagement',
     'customers',
     'businessManagement.apps.BusinessmanagementConfig',
-    #'djoser',
+    'django_rest_passwordreset',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
