@@ -9,7 +9,9 @@ from .views import (
     customize_receipt,
     create_business, get_business,
     upload_receipt_signature,
-    update_business)
+    update_business,
+    get_receipt_id)
+
 
 urlpatterns = [
     path("receipt/create", create_receipt),
