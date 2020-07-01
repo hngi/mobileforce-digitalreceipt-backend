@@ -13,7 +13,7 @@ class AuthorizationMiddleware(object):
 
     def __call__(self, request):
 
-        jwtEscapeUrls = ['/','/v1/user/otp_register','/v1/user/change_password','/v1/user/email/exists',
+        jwtEscapeUrls = ['/','/v1/user/otp_register','/v1/user/forgot_password','/v1/user/email/exists',
                          '/v1/user/register','/v1/user/login','/google']
         if 'media' in request.path:
             response = self.get_response(request)
