@@ -285,3 +285,13 @@ def get_business(request):
             return JsonResponse({
                 'error': error
             }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def update_business(request, id):
+    if request.method == 'POST':
+        bus = get_object_or_404(BusinessInfo, id=id)
+        serializer = BusinessInfoSerializer(request.POST or None, instance=bus)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.error, status= status.HTTP_400_BAD_REQUEST)
