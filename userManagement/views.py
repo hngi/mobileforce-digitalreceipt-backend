@@ -193,6 +193,45 @@ def change_password(request):
         if 'email_address' not in request.data:
             return JsonResponse({"error": "Enter email address"},
                                 status=status.HTTP_400_BAD_REQUEST)
+        if 'current_password' not in request.data:
+            return JsonResponse({"error": "Enter current_password"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        if 'password' not in request.data:
+            return JsonResponse({"error": "Enter password"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        try:
+            userUpdated = User.objects.filter(email_address=request.data['email_address'],
+                                              password=request.data['current_password']).update(
+                password=request.data['password'])
+            print(userUpdated)
+            if userUpdated:
+                data = {
+                    'message': "Updated password successfully" if userUpdated==1 else "Incorrect password entered",
+                    "status": status.HTTP_200_OK
+                }
+                return JsonResponse(data, status=status.HTTP_200_OK)
+            else:
+                data = {
+                    'message': "Incorrect password entered",
+                    "status": status.HTTP_400_BAD_REQUEST
+                }
+                return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return JsonResponse({
+                'error': "User Does not exist"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return JsonResponse({
+                'error': e
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+def forgot_password(request):
+    if request.method == 'PUT':
+        if 'email_address' not in request.data:
+            return JsonResponse({"error": "Enter email address"},
+                                status=status.HTTP_400_BAD_REQUEST)
         if 'password' not in request.data:
             return JsonResponse({"error": "Enter password"},
                                 status=status.HTTP_400_BAD_REQUEST)

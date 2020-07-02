@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com']
+ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com','degeit-receipt.herokuapp.com']
 
 
 # Application definition
@@ -98,10 +98,10 @@ WSGI_APPLICATION = 'digitalReceipt.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd6759nm1lpbtmm',
-        'USER': 'lxvylcgkrunnuy',
-        'PASSWORD': '3ffc69d388c478965610772cc76ee8586965bca6863c167f3080e30bfcd3ce21',
-        'HOST': 'ec2-52-202-66-191.compute-1.amazonaws.com',
+        'NAME': 'dauj6q89di61so',
+        'USER': 'ixlklkktcqejzs',
+        'PASSWORD': '52800eeea7fdc2911d1030cbc03f107576f1640901ed630345721d4edd97b05f',
+        'HOST': 'ec2-50-19-26-235.compute-1.amazonaws.com',
         'PORT': '5432',
 }
 }

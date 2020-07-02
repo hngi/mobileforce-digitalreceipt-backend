@@ -63,9 +63,9 @@ class Notifications(models.Model):
 
 class BusinessInfo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(null=False, unique=True, max_length=150)
+    name = models.CharField(null=False, max_length=150)
     phone_number = models.CharField(max_length=50, null=False)
     address = models.CharField(max_length=200, null=False)
-    slogan = models.CharField(max_length=50)
+    slogan = models.CharField(null=True,max_length=50)
     logo = models.FileField(null=True, upload_to=logo_directory_path)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User,unique=True, on_delete=models.CASCADE)

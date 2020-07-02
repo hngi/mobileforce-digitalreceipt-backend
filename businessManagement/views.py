@@ -164,6 +164,47 @@ def get_all_draft_receipt(request):
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(["GET"])
+def get_receipt_id(request):
+    # send the receipt id
+    if request.method == "GET":
+        try:
+            receipt = Receipts.objects.filter(id=request.query_params.get('receiptId'))
+            if receipt:
+                user = User.objects.get(id=request.user_id)
+                userData = UserSerializer(user, many=False).data
+                draftReceipts = ReceiptSerializer(receipt, many=True).data
+                for data in draftReceipts:
+                    data["user"] = {
+                        "id": userData["id"],
+                        "name": userData["name"],
+                        "email_address": userData["email_address"],
+                    }
+                    products = Products.objects.filter(receipt=data["id"])
+                    products_data = ProductSerializer(products, many=True).data
+                    data["products"] = products_data
+                    print(data["products"])
+                    customer = CustomerDetails.objects.get(pk=data["customer"])
+                    data["customer"] = CustomersSerializer(customer, many=False).data
+                    data["total"] = sum(
+                        c["unit_price"] * c["quantity"] for c in data["products"]
+                    )
+                return JsonResponse(
+                    {
+                        "message": "Retreived all drafted receipts",
+                        "data": draftReceipts,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return JsonResponse(
+                    {"message": "There are no draft receipts created"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as error:
+            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["POST"])
 def customize_receipt(request):
     if request.method == "POST":
@@ -257,10 +298,12 @@ def create_business(request):
             'name': request.data['name'],
             'phone_number': request.data['phone_number'],
             'address': request.data['address'],
-            'slogan': request.data['slogan'],
-            'logo': request.FILES['logo'],
-            'user':request.user_id
+            'user': request.user_id
         }
+        if 'slogan' in request.data:
+            data['slogan'] = request.data['slogan']
+        if 'logo' in request.FILES:
+            data['logo'] = request.FILES['logo']
         serializer = BusinessInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -275,7 +318,7 @@ def get_business(request):
             bus = BusinessInfo.objects.all().order_by('name')
             business = BusinessInfoSerializer(bus, many=True)
             return JsonResponse({
-                'data': business
+                'data': business.data
             }, status=status.HTTP_200_OK)
         except BusinessInfo.DoesNotExist:
             return JsonResponse({
@@ -286,52 +329,36 @@ def get_business(request):
                 'error': error
             }, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def update_business(request, id):
-    if request.method == 'POST':
-        bus = get_object_or_404(BusinessInfo, id=id)
-        serializer = BusinessInfoSerializer(request.POST or None, instance=bus)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_200_OK)
-        return JsonResponse(serializer.error, status= status.HTTP_400_BAD_REQUEST)
 
-@api_view(["GET"])
-def get_receipt_id(request):
-    # send the receipt id
-    if request.method == "GET":
+@api_view(['PUT'])
+def update_business(request):
+    if request.method == 'PUT':
         try:
-            receipt = Receipts.objects.filter(id=request.query_params.get('receiptId'))
-            if receipt:
-                user = User.objects.get(id=request.user_id)
-                userData = UserSerializer(user, many=False).data
-                draftReceipts = ReceiptSerializer(receipt, many=True).data
-                for data in draftReceipts:
-                    data["user"] = {
-                        "id": userData["id"],
-                        "name": userData["name"],
-                        "email_address": userData["email_address"],
-                    }
-                    products = Products.objects.filter(receipt=data["id"])
-                    products_data = ProductSerializer(products, many=True).data
-                    data["products"] = products_data
-                    print(data["products"])
-                    customer = CustomerDetails.objects.get(pk=data["customer"])
-                    data["customer"] = CustomersSerializer(customer, many=False).data
-                    data["total"] = sum(
-                        c["unit_price"] * c["quantity"] for c in data["products"]
-                    )
+            if "businessId" not in request.data:
                 return JsonResponse(
-                    {
-                        "message": "Retreived all drafted receipts",
-                        "data": draftReceipts,
-                    },
-                    status=status.HTTP_200_OK,
+                    {"error": "Enter businessId"}, status=status.HTTP_400_BAD_REQUEST
                 )
-            else:
-                return JsonResponse(
-                    {"message": "There are no draft receipts created"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            bus = BusinessInfo.objects.get(id=request.data['businessId'])
+            if 'name' in request.data:
+                bus.name = request.data['name']
+            if 'phone_number' in request.data:
+                bus.phone_number = request.data['phone_number']
+            if 'address' in request.data:
+                bus.address = request.data['address']
+            if 'slogan' in request.data:
+                bus.slogan = request.data['slogan']
+            if 'logo' in request.FILES:
+                bus.logo = request.FILES['logo']
+            bus.save()
+            business = BusinessInfoSerializer(bus, many=False)
+            return JsonResponse({
+                'data': business.data
+            }, status=status.HTTP_200_OK)
+        except BusinessInfo.DoesNotExist:
+            return JsonResponse({
+                'error': 'No Business found with this id'
+            }, status=status.HTTP_400_BAD_REQUEST)
         except Exception as error:
-            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)

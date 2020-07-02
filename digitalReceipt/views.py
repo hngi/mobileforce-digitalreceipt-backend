@@ -10,3 +10,4 @@ def index(request):
     date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     message = 'clock in server (is live current time) is:'
     return Response(data=message + date, status=status.HTTP_200_OK)
+
