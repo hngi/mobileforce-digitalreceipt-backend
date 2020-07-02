@@ -8,7 +8,10 @@ from .views import (
     get_all_draft_receipt,
     customize_receipt,
     create_business, get_business,
-    upload_receipt_signature, update_business, get_receipt_id)
+    upload_receipt_signature,
+    update_business,
+    get_receipt_id)
+
 
 urlpatterns = [
     path("receipt/create", create_receipt),
@@ -20,5 +23,7 @@ urlpatterns = [
     path("receipt/upload/signature", upload_receipt_signature),
     path('info/create', create_business),
     path('info/all', get_business),
-    path('info/update',update_business)
+    path('info/update',update_business),
+    path("receipt/one", get_receipt_id),
+
 ]
