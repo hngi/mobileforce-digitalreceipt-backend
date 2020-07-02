@@ -7,10 +7,13 @@ from .views import (
     get_all_receipt,
     get_all_draft_receipt,
     customize_receipt,
-    create_business, get_business,
+    create_business,
+    get_business,
     upload_receipt_signature,
     update_business,
-    get_receipt_id)
+    update_draft_receipt,
+    get_receipt_id,
+)
 
 
 urlpatterns = [
@@ -18,12 +21,12 @@ urlpatterns = [
     path("receipt/product", add_product_info_to_receipt),
     path("receipt/issued", get_all_receipt),
     path("receipt/draft", get_all_draft_receipt),
+    path("receipt/draft/update", update_draft_receipt),
     path("receipt/customize", customize_receipt),
     path("receipt/one", get_receipt_id),
     path("receipt/upload/signature", upload_receipt_signature),
-    path('info/create', create_business),
-    path('info/all', get_business),
-    path('info/update',update_business),
+    path("info/create", create_business),
+    path("info/all", get_business),
+    path("info/update", update_business),
     path("receipt/one", get_receipt_id),
-
 ]
