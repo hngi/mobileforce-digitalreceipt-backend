@@ -385,3 +385,23 @@ def update_business(request):
             )
         except Exception as error:
             return JsonResponse({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+def get_user_business(request):
+    if request.method == "GET":
+        try:
+            bus = BusinessInfo.objects.filter(user=request.user_id)
+            if bus:
+                businessSerializer = BusinessInfoSerializer(bus, many=True)
+                return JsonResponse(
+                    {"data": businessSerializer.data}, status=status.HTTP_200_OK
+                )
+            else:
+                return JsonResponse(
+                    {"data": "User does not have any Business registered"},
+                    status=status.HTTP_200_OK,
+                )
+
+        except Exception as error:
+            return JsonResponse({"error": error}, status=status.HTTP_400_BAD_REQUEST)
