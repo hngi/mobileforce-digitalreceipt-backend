@@ -373,7 +373,7 @@ def update_business(request):
             if "address" in request.data:
                 bus.address = request.data["address"]
             if "email_address" in request.data:
-                bus['email_address'] = request.data["email_address"]
+                bus.email_address = request.data["email_address"]
             if "slogan" in request.data:
                 bus.slogan = request.data["slogan"]
             if "logo" in request.FILES:
