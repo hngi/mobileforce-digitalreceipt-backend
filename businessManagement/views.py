@@ -39,8 +39,7 @@ def create_receipt(request):
         data = {
             "user": request.user_id,
             "customer": request.data["customerId"],
-            "receipt_number": 1,
-            "signature": request.FILES["signature"],
+            "receipt_number": add_one_to_receipt_number(request.user_id),
         }
         serializer = ReceiptSerializer(data=data)
         if serializer.is_valid():
