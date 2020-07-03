@@ -67,5 +67,6 @@ class BusinessInfo(models.Model):
     phone_number = models.CharField(max_length=50, null=False)
     address = models.CharField(max_length=200, null=False)
     slogan = models.CharField(null=True,max_length=50)
+    email_address=models.CharField(null=True,max_length=100)
     logo = models.FileField(null=True, upload_to=logo_directory_path)
     user = models.ForeignKey(User,unique=True, on_delete=models.CASCADE)

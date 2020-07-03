@@ -329,6 +329,8 @@ def create_business(request):
             "address": request.data["address"],
             "user": request.user_id,
         }
+        if "email_address" in request.data:
+            data['email_address'] = request.data["email_address"]
         if "slogan" in request.data:
             data["slogan"] = request.data["slogan"]
         if "logo" in request.FILES:
@@ -370,6 +372,8 @@ def update_business(request):
                 bus.phone_number = request.data["phone_number"]
             if "address" in request.data:
                 bus.address = request.data["address"]
+            if "email_address" in request.data:
+                bus['email_address'] = request.data["email_address"]
             if "slogan" in request.data:
                 bus.slogan = request.data["slogan"]
             if "logo" in request.FILES:
