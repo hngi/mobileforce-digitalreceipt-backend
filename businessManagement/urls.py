@@ -30,5 +30,4 @@ urlpatterns = [
     path("info/all", get_business),
     path("info/update", update_business),
     path("user/all", get_user_business),
-    path("receipt/one", get_receipt_id),
 ]
