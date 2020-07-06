@@ -56,7 +56,7 @@ class Notifications(models.Model):
     delivered = models.BooleanField(default=False)
     title = models.CharField(null=True, max_length=100)
     message = models.CharField(null=True, max_length=100)
-    date_to_deliver = models.DateField(null=True, max_length=100)
+    date_to_deliver = models.DateTimeField(null=True, default=datetime.now)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

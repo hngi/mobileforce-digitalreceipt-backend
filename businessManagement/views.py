@@ -13,8 +13,8 @@ from customers.models import CustomerDetails
 from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
-from .models import Receipts, Products, BusinessInfo
-from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer
+from .models import Receipts, Products, BusinessInfo, Notifications
+from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer
 
 
 def add_one_to_receipt_number(user):
@@ -260,7 +260,16 @@ def customize_receipt(request):
 
                 if receiptSerailizer.is_valid():
                     receiptSerailizer.save()
-
+                    if receiptData["partPayment"]:
+                        serailizer=NotificationsSerializer(data={
+                            'user':request.user_id,
+                            'delivered':False,
+                            'title':" Remainder ",
+                            'message':"Payment Remainder Receipt-"+receiptSerailizer.data["receipt_number"],
+                            'date_to_deliver':receiptData["partPaymentDateTime"]
+                        })
+                        if serailizer.is_valid():
+                            serailizer.save()
                 else:
                     errorsDict = {}
                     errorsDict.update(receiptSerailizer.errors)
@@ -274,6 +283,7 @@ def customize_receipt(request):
 
                 if productSerializer.is_valid():
                     productSerializer.save()
+
 
                 else:
                     errorsDict = {}

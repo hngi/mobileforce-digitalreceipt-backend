@@ -26,7 +26,8 @@ class NotificationsSerializer(serializers.ModelSerializer):
         model = Notifications
         fields = '__all__'
 
+
 class BusinessInfoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = BusinessInfo
-		fields = '__all__'
+    class Meta:
+        model = BusinessInfo
+        fields = '__all__'

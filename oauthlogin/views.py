@@ -76,7 +76,7 @@ class GoogleView(APIView):
             user = {
                 'email_address': data['email'],
                 'name': data['email'],
-                'password': make_password(BaseUserManager().make_random_password())[:40],
+                'password': make_password(BaseUserManager().make_random_password()),
                 'registration_id': request.data['registration_id'],
                 'deviceType': request.data['deviceType'],
                 'active': True,
