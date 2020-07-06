@@ -13,8 +13,8 @@ from customers.models import CustomerDetails
 from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
-from .models import Receipts, Products, BusinessInfo
-from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer
+from .models import Receipts, Products, BusinessInfo, Notifications
+from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer
 
 
 def add_one_to_receipt_number(user):
@@ -39,8 +39,7 @@ def create_receipt(request):
         data = {
             "user": request.user_id,
             "customer": request.data["customerId"],
-            "receipt_number": 1,
-            "signature": request.FILES["signature"],
+            "receipt_number": add_one_to_receipt_number(request.user_id),
         }
         serializer = ReceiptSerializer(data=data)
         if serializer.is_valid():
@@ -261,7 +260,16 @@ def customize_receipt(request):
 
                 if receiptSerailizer.is_valid():
                     receiptSerailizer.save()
-
+                    if receiptData["partPayment"]:
+                        serailizer=NotificationsSerializer(data={
+                            'user':request.user_id,
+                            'delivered':False,
+                            'title':" Remainder ",
+                            'message':"Payment Remainder Receipt-"+receiptSerailizer.data["receipt_number"],
+                            'date_to_deliver':receiptData["partPaymentDateTime"]
+                        })
+                        if serailizer.is_valid():
+                            serailizer.save()
                 else:
                     errorsDict = {}
                     errorsDict.update(receiptSerailizer.errors)
@@ -275,6 +283,7 @@ def customize_receipt(request):
 
                 if productSerializer.is_valid():
                     productSerializer.save()
+
 
                 else:
                     errorsDict = {}
@@ -330,6 +339,8 @@ def create_business(request):
             "address": request.data["address"],
             "user": request.user_id,
         }
+        if "email_address" in request.data:
+            data['email_address'] = request.data["email_address"]
         if "slogan" in request.data:
             data["slogan"] = request.data["slogan"]
         if "logo" in request.FILES:
@@ -371,6 +382,8 @@ def update_business(request):
                 bus.phone_number = request.data["phone_number"]
             if "address" in request.data:
                 bus.address = request.data["address"]
+            if "email_address" in request.data:
+                bus.email_address = request.data["email_address"]
             if "slogan" in request.data:
                 bus.slogan = request.data["slogan"]
             if "logo" in request.FILES:

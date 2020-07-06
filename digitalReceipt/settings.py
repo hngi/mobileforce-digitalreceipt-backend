@@ -26,7 +26,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com','degeit-receipt.herokuapp.com']
+ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com','degeit-receipt.herokuapp.com',
+'hng-degeit-receipt.herokuapp.com']
 
 
 # Application definition
@@ -93,15 +94,16 @@ WSGI_APPLICATION = 'digitalReceipt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# cnx = psycopg2.connect(host="SG-digitalReceipt-872-pgsql-master.servers.mongodirector.com" user="<user>" password="<password>" dbname="<your-database-name>" port=6432)
 
 
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dauj6q89di61so',
-        'USER': 'ixlklkktcqejzs',
-        'PASSWORD': '52800eeea7fdc2911d1030cbc03f107576f1640901ed630345721d4edd97b05f',
-        'HOST': 'ec2-50-19-26-235.compute-1.amazonaws.com',
+        'NAME': 'd6tkk3q19jvodt',
+        'USER': 'bauitvjbrsytja',
+        'PASSWORD': 'b88f985b9bae39bad9da6b6f31abcaf5efe6505459d523ca054fe0d92b9becec',
+        'HOST': 'ec2-34-224-229-81.compute-1.amazonaws.com',
         'PORT': '5432',
 }
 }
