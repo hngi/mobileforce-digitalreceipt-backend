@@ -123,6 +123,57 @@ def user_registration_send_email(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+@api_view(["POST"])
+def user_send_email(request):
+    if request.method == "POST":
+        if "email_address" not in request.data:
+            return JsonResponse(
+                {"error": "Enter email address"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        email_address = request.data["email_address"]
+        try:
+            validate_email(email_address)
+        except ValidationError as e:
+            return JsonResponse(
+                {"error": "Enter valid email address"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            # Check if there is any user with this email address
+            try:
+                userData = User.objects.get(email_address=request.data["email_address"])
+                otp = otpgen()
+                try:
+                    gm = Gmail(settings.email_address, settings.email_app_password)
+                    gm.send_message(
+                        "Forgot Password OTP  - Digital Receipt",
+                        emailOtpMessage(otp),
+                        request.data["email_address"],
+                    )
+                    return JsonResponse(
+                        {
+                            "data": {
+                                "otp": otp,
+                                "email_address": request.data["email_address"],
+                            },
+                            "message": "Sent email with otp successfully",
+                            "status": status.HTTP_200_OK,
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+                except Exception as error:
+                    return JsonResponse(
+                        {"error": error}, status=status.HTTP_400_BAD_REQUEST
+                    )
+            except User.DoesNotExist:
+                return JsonResponse({"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return JsonResponse({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse(
+                    {"error": "Email address is already registered"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
 @api_view(["POST"])
 def create_user(request):
