@@ -231,23 +231,29 @@ def get_receipt_id(request):
 def customize_receipt(request):
     if request.method == "POST":
         try:
+            if "email" not in request.data["customer"]:
+                return JsonResponse(
+                    {"error": "Enter email id of customer"}, status=status.HTTP_400_BAD_REQUEST,
+                )
             customerData = request.data["customer"]
             customerData["user"] = request.user_id
-
-            customerSerializer = CustomersSerializer(data=customerData)
-
+            cust = CustomerDetails.objects.filter(email=request.data["customer"]['email'], user=request.user_id)
+            print(cust)
+            if len(cust) == 0:
+                customerSerializer = CustomersSerializer(data=customerData)
+                is_customer_valid = customerSerializer.is_valid()
+                if is_customer_valid:
+                    customerSerializer.save()
+            cust = CustomerDetails.objects.get(email=request.data["customer"]['email'], user=request.user_id)
+            customerSerializer = CustomersSerializer(cust)
             receiptData = request.data["receipt"]
             receiptData["user"] = request.user_id
             productData = request.data["products"]
 
-            is_customer_valid = customerSerializer.is_valid()
-
-            if is_customer_valid:
-                customerSerializer.save()
-
+            if customerSerializer:
                 if "receipt_number" in receiptData:
                     receiptData["receipt_number"] = (
-                        "AG-" + receiptData["receipt_number"]
+                            "AG-" + receiptData["receipt_number"]
                     )
                 else:
                     receiptData["receipt_number"] = add_one_to_receipt_number(
@@ -261,12 +267,12 @@ def customize_receipt(request):
                 if receiptSerailizer.is_valid():
                     receiptSerailizer.save()
                     if receiptData["partPayment"]:
-                        serailizer=NotificationsSerializer(data={
-                            'user':request.user_id,
-                            'delivered':False,
-                            'title':" Remainder ",
-                            'message':"Payment Remainder Receipt-"+receiptSerailizer.data["receipt_number"],
-                            'date_to_deliver':receiptData["partPaymentDateTime"]
+                        serailizer = NotificationsSerializer(data={
+                            'user': request.user_id,
+                            'delivered': False,
+                            'title': " Remainder ",
+                            'message': "Payment Remainder Receipt-" + receiptSerailizer.data["receipt_number"],
+                            'date_to_deliver': receiptData["partPaymentDateTime"]
                         })
                         if serailizer.is_valid():
                             serailizer.save()
