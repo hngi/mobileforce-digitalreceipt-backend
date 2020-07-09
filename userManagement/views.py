@@ -123,6 +123,7 @@ def user_registration_send_email(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+
 @api_view(["POST"])
 def user_send_email(request):
     if request.method == "POST":
@@ -174,6 +175,7 @@ def user_send_email(request):
                     {"error": "Email address is already registered"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
 
 @api_view(["POST"])
 def create_user(request):
@@ -304,7 +306,7 @@ def change_password(request):
             if not check_password(request.data["password"], userData['password']):
                 return JsonResponse({"error": "Invalid username/password"}, status=status.HTTP_400_BAD_REQUEST)
             userUpdated = User.objects.filter(id=request.user_id
-            ).update(password=make_password(request.data["password"]))
+                                              ).update(password=make_password(request.data["password"]))
             print(userUpdated)
             data = {
                 "message": "Updated password successfully"
@@ -347,9 +349,17 @@ def forgot_password(request):
                 {"error": "Enter password"}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
+            user = User.objects.get(email_address=request.data["email_address"])
+            userData = UserSerializer(user, many=False).data
             userUpdated = User.objects.filter(
                 email_address=request.data["email_address"]
-            ).update(password=make_password(request.data["password"]))
+            ).update(password=make_password(request.data["password"]),
+                     registration_id=None, deviceType=None, active=False
+                     )
+            if userData['active']:
+                FCMDevice.objects.filter(
+                    type=userData["deviceType"], registration_id=userData["registration_id"]
+                ).delete()
             data = {
                 "message": "Updated password successfully",
                 "status": status.HTTP_200_OK,
