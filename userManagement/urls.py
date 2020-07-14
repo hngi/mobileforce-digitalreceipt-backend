@@ -11,6 +11,7 @@ from .views import (
     logout,
     forgot_password,
     get_all_notifications,
+    user_send_email_pdf,
     get_user_details, user_send_email)
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
     path("notification/create", create_notification),
     path("notification/all", get_all_notifications),
     path("notification/create/send/now", send_notification_now),
+    path("sendemail/pdf",user_send_email_pdf)
 ]
