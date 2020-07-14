@@ -1,5 +1,6 @@
 import smtplib
-
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
 
 
 class Gmail(object):
@@ -23,6 +24,22 @@ class Gmail(object):
         except Exception as error:
             self.smtp_connect(self.fromEmail, self.password)
             self.send_message(subject, body, toEmail)
+
+    def send_pdf_message(self, subject, toEmail,uploaded_file):
+        try:
+            # Craft message (obj)
+            msg = MIMEMultipart()
+            msg['Subject'] = subject
+            msg['From'] = self.fromEmail
+            msg['To'] = toEmail
+            attach = MIMEApplication(uploaded_file.read(), _subtype="pdf")
+            attach.add_header('Content-Disposition', 'attachment', filename=str(uploaded_file.name))
+            msg.attach(attach)
+            self.session.send_message(msg)
+            self.session.close()
+        except Exception as error:
+            self.smtp_connect(self.fromEmail, self.password)
+            self.send_pdf_message(subject, toEmail,uploaded_file)
 
     def smtp_connect(self, fromEmail, password):
         self.fromEmail = fromEmail
