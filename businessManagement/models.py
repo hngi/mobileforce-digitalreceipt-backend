@@ -37,6 +37,7 @@ class Receipts(models.Model):
     signature = models.FileField(null=True, upload_to=user_directory_path)
     partPayment = models.BooleanField(null=True, default=False)
     partPaymentDateTime = models.DateTimeField(null=True, default=datetime.now)
+    currency = models.CharField(max_length = 14, null=True)
     customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=False)
 
 
