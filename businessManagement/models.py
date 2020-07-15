@@ -74,3 +74,13 @@ class BusinessInfo(models.Model):
     email_address=models.CharField(null=True,max_length=100)
     logo = models.FileField(null=True, upload_to=logo_directory_path)
     user = models.ForeignKey(User,unique=True, on_delete=models.CASCADE)
+    
+class Inventory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(null=False, max_length=100)
+    quantity = models.PositiveIntegerField(
+        null=False, validators=[MinValueValidator(1)]
+    )
+    price = models.PositiveIntegerField(
+        null=True, validators=[MinValueValidator(1)]
+    )
