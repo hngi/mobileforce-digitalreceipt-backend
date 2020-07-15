@@ -14,7 +14,7 @@ from .views import (
     update_draft_receipt,
     get_receipt_id,
     get_user_business,
-)
+    add_data_to_inventory)
 
 
 urlpatterns = [
@@ -30,4 +30,5 @@ urlpatterns = [
     path("info/all", get_business),
     path("info/update", update_business),
     path("user/all", get_user_business),
+    path("inventory/add", add_data_to_inventory),
 ]

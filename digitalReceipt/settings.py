@@ -11,23 +11,21 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'b&!_55_-n0p33)lx=#)$@h#9u13kxz%ucughc%k@w_^x0gyz!b'
-
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = '8rn#wn+7=rtfs53wz!#)4(*0g361d^x97p79j75fzx=7^i^wlj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['frozen-island-67494.herokuapp.com','127.0.0.1','digital-receipt-07.herokuapp.com','degeit.herokuapp.com','degeit-receipt.herokuapp.com',
-'hng-degeit-receipt.herokuapp.com']
+ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1']
 
 
 # Application definition
@@ -38,20 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.sites',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'authapp',
-    'userManagement',
-    'customers',
     'businessManagement.apps.BusinessmanagementConfig',
-    'django_rest_passwordreset',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.facebook',
+    'customers.apps.customersConfig',
+    'userManagement.apps.UsermanagementConfig',
+    'oauthlogin.apps.OauthloginConfig',
     'drf_yasg',
     "fcm_django"
 ]
@@ -65,9 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'digitalReceipt.middleware.authMiddleWare.AuthorizationMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-
 
 ROOT_URLCONF = 'digitalReceipt.urls'
 
@@ -81,7 +68,6 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                # 'django.core.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -94,37 +80,13 @@ WSGI_APPLICATION = 'digitalReceipt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# cnx = psycopg2.connect(host="SG-digitalReceipt-872-pgsql-master.servers.mongodirector.com" user="<user>" password="<password>" dbname="<your-database-name>" port=6432)
-
-
 DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd1veect8ocgv7i',
-        'USER': 'mzbidnptohwgpt',
-        'PASSWORD': 'b05315bebd3c751df7e55ffed459e52e0b38240446900620aa55e35b492b1859',
-        'HOST': 'ec2-54-197-254-117.compute-1.amazonaws.com',
-        'PORT': '5432',
-}
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
-import dj_database_url
-#
-db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
-DATABASES['default'].update(db_from_env)
-#dj_database_url.config(default='postgres://...'}
-
-REST_FRAMEWORK = {
-    'DEFAULT AUTHENTICATION_CLASSES':(
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ),
-    'DEFAULT_PERMISSIONS-CLASSES':(
-        'rest_framework.permissions.IsAuthenticated'
-    ),
-
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -144,6 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -157,18 +120,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-)
-STATIC_ROOT = os.path.join(BASE_DIR, "live-static-files", "static-root")
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "live-static-files", "media-root")
+MEDIA_ROOT = '/home/degeitreceipt/bcknd/static/media'
+
+STATIC_ROOT = '/home/degeitreceipt/bcknd/static'
 
 
 # No security issues occur in email the given password here is an app password
@@ -180,12 +140,3 @@ FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": "AAAAMRXIXr0:APA91bGZWkJaJClsj91nx_wmwKyYYzl7BU287NjGVmKV7ZY5Xmxyt11ptjZZXtlaFvsuDRE3wXaOK6hWIcHd8hY93MXlwhcxI3U5Gz_u0zvOQ8g9VZzHBQI4Uef4CA3FRYY0OOEXzijL",
 }
 
-#Authentication backend (google Facebook and apple)
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-)
-
-
-SITE_ID = 1
-LOGIN_REDIRECT_URL = 'logged/'

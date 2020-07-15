@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class GoogleConfig(AppConfig):
+class OauthloginConfig(AppConfig):
     name = 'oauthlogin'

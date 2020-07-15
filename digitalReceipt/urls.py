@@ -17,17 +17,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from django.conf import settings
-#from .router import router
-from rest_framework.authtoken import views
-from django.views.generic import TemplateView
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
 
 from . import settings
 from .cron.notification import start
-from .views import index
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+
 from oauthlogin import views
 
 
@@ -47,17 +44,13 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('checkserver/', index, name='index'),
-    path('v1/user/', include('userManagement.urls')),
     path('v1/business/', include('businessManagement.urls')),
     path('v1/customer/', include('customers.urls')),
+    path('v1/user/', include('userManagement.urls')),
     path('', schema_view.with_ui('swagger', cache_timeout=0),
          name='schema-swagger-ui'),
-    path('hello/', views.HelloView.as_view(), name='hello'),
     path('google', views.GoogleView.as_view(), name='google'),
-    path('api/password_reset/',
-         include('django_rest_passwordreset.urls', namespace='password_reset')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
-start()
+# start()

@@ -588,31 +588,3 @@ def get_all_notifications(request):
                 )
         except Exception as error:
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST, )
-
-@api_view(["PUT"])
-def update_user(request):
-    if request.method == "PUT":
-        try:
-            if "UserId" not in request.data:
-                return JsonResponse(
-                    {"error": "Enter UserId"}, status=status.HTTP_400_BAD_REQUEST
-                )
-            user = User.objects.get(id=request.data["UserId"])
-            if "name" in request.data:
-                user.name = request.data["name"]
-            if "email_address" in request.data:
-                user.email_address = request.data["email_address"]
-            if "password" in request.data:
-                user.password = request.data["password"]
-            if "deviceType" in request.data:
-                user.deviceType = request.data["deviceType"]
-            user.save()
-            users = UserSerializer(user, many=False)
-            return JsonResponse({"data": users.data}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return JsonResponse(
-                {"error": "No User found with this id"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as error:
-            return JsonResponse({"error": error}, status=status.HTTP_400_BAD_REQUEST)
