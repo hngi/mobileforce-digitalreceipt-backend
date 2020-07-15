@@ -11,12 +11,15 @@ from .views import (
     logout,
     forgot_password,
     get_all_notifications,
+    get_user_details, user_send_email,
+    update_user,
     user_send_email_pdf,
     get_user_details, user_send_email)
 
 urlpatterns = [
     path("otp_register", user_registration_send_email),
     path("register", create_user),
+    path('update', update_user),
     path("login", login),
     path("change_password", change_password),
     path('send_email',user_send_email),
