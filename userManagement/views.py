@@ -178,6 +178,45 @@ def user_send_email(request):
 
 
 @api_view(["POST"])
+def user_send_email_pdf(request):
+    if request.method == "POST":
+        if "email_address" not in request.data:
+            return JsonResponse(
+                {"error": "Enter email address"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if "subject" not in request.data:
+            return JsonResponse(
+                {"error": "Enter subject"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        email_address = request.data["email_address"]
+        try:
+            validate_email(email_address)
+        except ValidationError as e:
+            return JsonResponse(
+                {"error": "Enter valid email address"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            # Check if there is any user with this email address
+            try:
+                gm = Gmail(settings.email_address, settings.email_app_password)
+                gm.send_pdf_message(
+                    request.data["subject"],
+                    request.data["email_address"],
+                    request.FILES['receipt']
+                )
+                return JsonResponse(
+                    {
+                        "message": "Sent email with successfully",
+                        "status": status.HTTP_200_OK,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except Exception as e:
+                return JsonResponse({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
 def create_user(request):
     if request.method == "POST":
         if "email_address" not in request.data:
