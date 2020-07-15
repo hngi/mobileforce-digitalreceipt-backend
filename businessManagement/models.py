@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.validators import MinValueValidator
 from django.db import models
 import uuid
-
+from decimal import Decimal
 # Create your models here.
 from customers.models import CustomerDetails
 from userManagement.models import User
@@ -47,6 +47,9 @@ class Products(models.Model):
         null=False, validators=[MinValueValidator(1)]
     )
     unit_price = models.FloatField(null=False, validators=[MinValueValidator(0)])
+    tax_amount = models.FloatField(null=False, validators=[MinValueValidator(0)], default=Decimal('0.00'))
+    discount = models.DecimalField(decimal_places=2, max_digits=10, default=Decimal('0.00'))
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
