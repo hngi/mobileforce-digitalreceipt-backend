@@ -13,8 +13,9 @@ from customers.models import CustomerDetails
 from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
-from .models import Receipts, Products, BusinessInfo, Notifications
-from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer
+from .models import Receipts, Products, BusinessInfo, Notifications, Inventory, Category
+from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer, \
+    InventorySerializer, CategorySerializer
 
 
 def add_one_to_receipt_number(user):
@@ -424,3 +425,53 @@ def get_user_business(request):
 
         except Exception as error:
             return JsonResponse({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+def add_data_to_inventory(request):
+    if request.method == "POST":
+        if "category_name" not in request.data:
+            return JsonResponse(
+                {"error": "Enter category_name"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if "product_name" not in request.data:
+            return JsonResponse(
+                {"error": "Enter product_name"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if "quantity" not in request.data:
+            return JsonResponse(
+                {"error": "Enter quantity"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            cat = Category.objects.get(name=request.data['category_name'])
+            categoryData = CategorySerializer(cat)
+        except Category.DoesNotExist:
+            categoryData = CategorySerializer(data={
+                'name': request.data['category_name']
+            })
+            if categoryData.is_valid():
+                categoryData.save()
+            cat = Category.objects.get(name=request.data['category_name'])
+        try:
+            inventory = Inventory.objects.get(name=request.data['product_name'],category=categoryData.data['id'],user=request.user_id)
+            inventoryData = InventorySerializer(inventory)
+        except Inventory.DoesNotExist:
+            inventoryData = {
+                'name': request.data['product_name'],
+                'category':categoryData.data['id'],
+                'quantity': request.data['quantity'],
+                'user':request.user_id
+            }
+            if "price" in request.data:
+                inventoryData["price"] = request.data['price']
+            inventoryData = InventorySerializer(data=inventoryData)
+            if inventoryData.is_valid():
+                inventoryData.save()
+                return JsonResponse({"data": inventoryData.data}, status=status.HTTP_200_OK)
+            return JsonResponse({"errors": inventoryData.errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            quantity = inventoryData.data['quantity']
+            inventory.quantity = quantity + float(request.data['quantity'])
+            inventory.save()
+            inventoryData = InventorySerializer(inventory)
+            return JsonResponse({"data": inventoryData.data}, status=status.HTTP_200_OK)
