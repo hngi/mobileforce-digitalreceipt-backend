@@ -555,6 +555,7 @@ def add_data_to_inventory(request):
                 "name": request.data["product_name"],
                 "category": categoryData.data["id"],
                 "quantity": request.data["quantity"],
+                "unit": request.data["unit"],
                 "user": request.user_id,
                 "price": request.data["price"],
             }

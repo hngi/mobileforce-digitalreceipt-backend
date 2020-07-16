@@ -91,5 +91,6 @@ class Inventory(models.Model):
     quantity = models.PositiveIntegerField(
         null=False, validators=[MinValueValidator(1)]
     )
+    unit = models.CharField(max_length= 20, null=True)
     price = models.FloatField(null=False, validators=[MinValueValidator(0)],default=Decimal('0.00'))
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
