@@ -115,7 +115,7 @@ def get_all_receipt(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * (100 - c["discount"]) * c["quantity"]
+                        c["unit_price"] * (100 - c["discount"]) / 100 * c["quantity"]
                         + c["tax_amount"]
                         for c in data["products"]
                     )
@@ -155,7 +155,7 @@ def get_all_draft_receipt(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * (100 - c["discount"]) * c["quantity"]
+                        c["unit_price"] * (100 - c["discount"]) / 100 * c["quantity"]
                         + c["tax_amount"]
                         for c in data["products"]
                     )
@@ -223,7 +223,7 @@ def get_receipt_id(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * (100 - c["discount"]) * c["quantity"]
+                        c["unit_price"] * (100 - c["discount"]) / 100 * c["quantity"]
                         + c["tax_amount"]
                         for c in data["products"]
                     )
