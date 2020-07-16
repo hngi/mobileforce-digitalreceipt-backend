@@ -55,6 +55,7 @@ class Products(models.Model):
     quantity = models.PositiveIntegerField(
         null=False, validators=[MinValueValidator(1)]
     )
+    unit = models.CharField(max_length=20, null=True)
     unit_price = models.FloatField(null=False, validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(auto_now_add=True)
     tax_amount = models.FloatField(null=False, validators=[MinValueValidator(0)], default=Decimal('0.00'))
