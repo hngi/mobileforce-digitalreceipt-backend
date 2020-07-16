@@ -14,14 +14,8 @@ from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
 from .models import Receipts, Products, BusinessInfo, Notifications, Inventory, Category
-from .serializers import (
-    ReceiptSerializer,
-    ProductSerializer,
-    BusinessInfoSerializer,
-    NotificationsSerializer,
-    InventorySerializer,
-    CategorySerializer,
-)
+from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer,
+    InventorySerializer, CategorySerializer
 
 
 def add_one_to_receipt_number(user):
@@ -82,8 +76,8 @@ def add_product_info_to_receipt(request):
             "name": request.data["name"],
             "quantity": request.data["quantity"],
             "unit_price": request.data["unit_price"],
-            "discount": request.data.get("discount", 0.00),
-            "tax_amount": request.data.get("tax_amount", 0.00),
+            "tax_amount": request.data["tax_amount"],
+            "discount": request.data["discount"]
         }
         serializer = ProductSerializer(data=data)
         if serializer.is_valid():
