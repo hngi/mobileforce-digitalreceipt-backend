@@ -39,11 +39,18 @@ class Receipts(models.Model):
     partPayment = models.BooleanField(null=True, default=False)
     partPaymentDateTime = models.DateTimeField(null=True, default=datetime.now)
     currency = models.CharField(max_length=14, null=True)
-    customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=False)
+    customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=True)
+
+
+class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class Products(models.Model):
     receipt = models.ForeignKey(Receipts, on_delete=models.CASCADE, null=False)
+    category_name = models.CharField(null=True, max_length=100)
     name = models.CharField(null=False, max_length=100)
     quantity = models.PositiveIntegerField(
         null=False, validators=[MinValueValidator(1)]
@@ -76,22 +83,12 @@ class BusinessInfo(models.Model):
     user = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
 
 
-class Category(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, unique=True, null=False)
-
-
 class Inventory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE,null=True,blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(null=False, max_length=100)
     quantity = models.PositiveIntegerField(
         null=False, validators=[MinValueValidator(1)]
     )
-    price = models.PositiveIntegerField(
-        null=True, validators=[MinValueValidator(1)]
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
-
-
-
+    price = models.FloatField(null=False, validators=[MinValueValidator(0)],default=Decimal('0.00'))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
