@@ -82,6 +82,7 @@ def add_product_info_to_receipt(request):
             "name": request.data["name"],
             "category_name": request.data["category_name"],
             "quantity": request.data["quantity"],
+            "unit": request.data["unit"],
             "unit_price": request.data["unit_price"],
             "tax_amount": request.data.get("tax_amount", 0.00),
             "discount": request.data.get("discount", 0.00),
@@ -554,6 +555,7 @@ def add_data_to_inventory(request):
                 "name": request.data["product_name"],
                 "category": categoryData.data["id"],
                 "quantity": request.data["quantity"],
+                "unit": request.data["unit"],
                 "user": request.user_id,
                 "price": request.data["price"],
             }
