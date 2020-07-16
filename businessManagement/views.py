@@ -14,8 +14,14 @@ from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
 from .models import Receipts, Products, BusinessInfo, Notifications, Inventory, Category
-from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer,
-    InventorySerializer, CategorySerializer
+from .serializers import (
+    ReceiptSerializer,
+    ProductSerializer,
+    BusinessInfoSerializer,
+    NotificationsSerializer,
+    InventorySerializer,
+    CategorySerializer,
+)
 
 
 def add_one_to_receipt_number(user):
@@ -74,10 +80,11 @@ def add_product_info_to_receipt(request):
         data = {
             "receipt": request.data["receiptId"],
             "name": request.data["name"],
+            "category_name": request.data["category_name"],
             "quantity": request.data["quantity"],
             "unit_price": request.data["unit_price"],
-            "tax_amount": request.data["tax_amount"],
-            "discount": request.data["discount"]
+            "tax_amount": request.data.get("tax_amount", 0.00),
+            "discount": request.data.get("discount", 0.00),
         }
         serializer = ProductSerializer(data=data)
         if serializer.is_valid():
@@ -109,8 +116,13 @@ def get_all_receipt(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * (100 - c["discount"]) * c["quantity"]
-                        + c["tax_amount"]
+                        float(
+                            c["unit_price"]
+                            * (100 - c["discount"])
+                            / 100
+                            * c["quantity"]
+                            + c["tax_amount"]
+                        )
                         for c in data["products"]
                     )
                 return JsonResponse(
@@ -149,8 +161,13 @@ def get_all_draft_receipt(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * (100 - c["discount"]) * c["quantity"]
-                        + c["tax_amount"]
+                        float(
+                            c["unit_price"]
+                            * (100 - c["discount"])
+                            / 100
+                            * c["quantity"]
+                            + c["tax_amount"]
+                        )
                         for c in data["products"]
                     )
                 return JsonResponse(
@@ -217,8 +234,13 @@ def get_receipt_id(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * (100 - c["discount"]) * c["quantity"]
-                        + c["tax_amount"]
+                        float(
+                            c["unit_price"]
+                            * (100 - c["discount"])
+                            / 100
+                            * c["quantity"]
+                            + c["tax_amount"]
+                        )
                         for c in data["products"]
                     )
                 return JsonResponse(
