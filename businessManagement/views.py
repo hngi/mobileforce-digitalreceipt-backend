@@ -14,7 +14,7 @@ from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
 from .models import Receipts, Products, BusinessInfo, Notifications, Inventory, Category
-from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer, \
+from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer,
     InventorySerializer, CategorySerializer
 
 
