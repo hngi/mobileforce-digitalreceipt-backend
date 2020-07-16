@@ -39,8 +39,10 @@ def get_customer(request, id):
             }, status=status.HTTP_400_BAD_REQUEST)
     if request.method == "DELETE":
         try:
-            customer = CustomerDetails.objects.get(user=request.user_id, id=id)
+
+            customer = CustomerDetails.objects.filter(user=request.user_id, id=id)
             customer.delete()
+            return JsonResponse({"data": "customer deleted successfully"}, status=status.HTTP_200_OK)
         except CustomerDetails.DoesNotExist:
             return JsonResponse(
                 {"error": "Could not delete, no customer found"},
