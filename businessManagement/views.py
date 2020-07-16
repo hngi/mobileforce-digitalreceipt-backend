@@ -82,8 +82,8 @@ def add_product_info_to_receipt(request):
             "name": request.data["name"],
             "quantity": request.data["quantity"],
             "unit_price": request.data["unit_price"],
-            "tax_amount": request.data["tax_amount"],
-            "discount": request.data["discount"],
+            "tax_amount": request.data.get("tax_amount", 0.00),
+            "discount": request.data.get("discount", 0.00),
         }
         serializer = ProductSerializer(data=data)
         if serializer.is_valid():
