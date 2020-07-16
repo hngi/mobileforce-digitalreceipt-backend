@@ -27,7 +27,7 @@ def otpgen():
 
 def emailOtpMessage(otp):
     html = (
-            """
+        """
             <html>
                 <body>
                     <p>Hello,<br><br>
@@ -35,8 +35,8 @@ def emailOtpMessage(otp):
                     Please verify your OTP. Your OTP number is below
                     <br><br>
                      <b>"""
-            + otp
-            + """</b>
+        + otp
+        + """</b>
                     </p>
                 </body>
             </html>
@@ -167,7 +167,9 @@ def user_send_email(request):
                         {"error": error}, status=status.HTTP_400_BAD_REQUEST
                     )
             except User.DoesNotExist:
-                return JsonResponse({"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse(
+                    {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
+                )
             except Exception as e:
                 return JsonResponse({"error": e}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -203,7 +205,7 @@ def user_send_email_pdf(request):
                 gm.send_pdf_message(
                     request.data["subject"],
                     request.data["email_address"],
-                    request.FILES['receipt']
+                    request.FILES["receipt"],
                 )
                 return JsonResponse(
                     {
@@ -271,23 +273,26 @@ def login(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if not (
-                request.data["deviceType"] == "andriod"
-                or request.data["deviceType"] == "ios"
+            request.data["deviceType"] == "andriod"
+            or request.data["deviceType"] == "ios"
         ):
             return JsonResponse(
                 {"error": "Enter valid device type (andriod/ios)"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         try:
-            user = User.objects.get(
-                email_address=request.data["email_address"],
-            )
+            user = User.objects.get(email_address=request.data["email_address"],)
             userData = UserSerializer(user, many=False).data
-            if not check_password(request.data["password"], userData['password']):
-                return JsonResponse({"error": "Invalid username/password"}, status=status.HTTP_400_BAD_REQUEST)
-            if userData['active']:
-                return JsonResponse({"error": "Cannot login in more that one device"},
-                                    status=status.HTTP_400_BAD_REQUEST)
+            if not check_password(request.data["password"], userData["password"]):
+                return JsonResponse(
+                    {"error": "Invalid username/password"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if userData["active"]:
+                return JsonResponse(
+                    {"error": "Cannot login in more that one device"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             userData["exp"] = datetime.datetime.utcnow() + datetime.timedelta(
                 seconds=7 * 86400
             )
@@ -342,10 +347,14 @@ def change_password(request):
         try:
             user = User.objects.get(email_address=request.data["email_address"])
             userData = UserSerializer(user).data
-            if not check_password(request.data["password"], userData['password']):
-                return JsonResponse({"error": "Invalid username/password"}, status=status.HTTP_400_BAD_REQUEST)
-            userUpdated = User.objects.filter(id=request.user_id
-                                              ).update(password=make_password(request.data["password"]))
+            if not check_password(request.data["current_password"], userData["password"]):
+                return JsonResponse(
+                    {"error": "Invalid username/password"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            userUpdated = User.objects.filter(id=request.user_id).update(
+                password=make_password(request.data["password"])
+            )
             print(userUpdated)
             data = {
                 "message": "Updated password successfully"
@@ -392,12 +401,16 @@ def forgot_password(request):
             userData = UserSerializer(user, many=False).data
             userUpdated = User.objects.filter(
                 email_address=request.data["email_address"]
-            ).update(password=make_password(request.data["password"]),
-                     registration_id=None, deviceType=None, active=False
-                     )
-            if userData['active']:
+            ).update(
+                password=make_password(request.data["password"]),
+                registration_id=None,
+                deviceType=None,
+                active=False,
+            )
+            if userData["active"]:
                 FCMDevice.objects.filter(
-                    type=userData["deviceType"], registration_id=userData["registration_id"]
+                    type=userData["deviceType"],
+                    registration_id=userData["registration_id"],
                 ).delete()
             data = {
                 "message": "Updated password successfully",
@@ -448,8 +461,8 @@ def update_registration_id(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if not (
-                request.data["deviceType"] == "andriod"
-                or request.data["deviceType"] == "ios"
+            request.data["deviceType"] == "andriod"
+            or request.data["deviceType"] == "ios"
         ):
             return JsonResponse(
                 {"error": "Enter valid device type (andriod/ios)"},
@@ -587,4 +600,4 @@ def get_all_notifications(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception as error:
-            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST, )
+            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST,)
