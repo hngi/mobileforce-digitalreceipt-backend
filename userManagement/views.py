@@ -347,13 +347,13 @@ def change_password(request):
         try:
             user = User.objects.get(email_address=request.data["email_address"])
             userData = UserSerializer(user).data
-            if not check_password(request.data["password"], userData["password"]):
+            if not check_password(request.data["current_password"], userData["password"]):
                 return JsonResponse(
                     {"error": "Invalid username/password"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             userUpdated = User.objects.filter(id=request.user_id).update(
-                password=make_password(request.data["current_password"])
+                password=make_password(request.data["password"])
             )
             print(userUpdated)
             data = {
