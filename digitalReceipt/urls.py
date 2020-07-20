@@ -31,7 +31,7 @@ from oauthlogin import views
 schema_view = get_schema_view(
     openapi.Info(
         title="Digital Receipt API",
-        default_version='v1',
+        default_version="v1",
         description="Test the API here using Swagger, For postman please go here: https://documenter.getpostman.com/view/6370926/T17AkB4N?version=latest ",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@snippets.local"),
@@ -43,13 +43,13 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('v1/business/', include('businessManagement.urls')),
-    path('v1/customer/', include('customers.urls')),
-    path('v1/user/', include('userManagement.urls')),
-    path('', schema_view.with_ui('swagger', cache_timeout=0),
-         name='schema-swagger-ui'),
-    path('google', views.GoogleView.as_view(), name='google'),
+    path("admin/", admin.site.urls),
+    path("v1/business/", include("businessManagement.urls")),
+    path("v1/customer/", include("customers.urls")),
+    path("v1/user/", include("userManagement.urls")),
+    path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
+    path("google", views.GoogleView.as_view(), name="google"),
+    path("v1/promotion/", include("promotions.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
