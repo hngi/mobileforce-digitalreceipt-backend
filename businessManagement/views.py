@@ -583,7 +583,6 @@ def add_data_to_inventory(request):
 def update_inventory(request, id):
     if request.method == "DELETE":
         try:
-            breakpoint()
             inventory = Inventory.objects.filter(id=id)
             if len(inventory) == 0:
                 return JsonResponse(
