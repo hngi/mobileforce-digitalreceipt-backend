@@ -14,7 +14,7 @@ from .views import (
     update_draft_receipt,
     get_receipt_id,
     get_user_business,
-    add_data_to_inventory, get_all_categories, get_items_inventory)
+    add_data_to_inventory, get_all_categories, get_items_inventory, delete_inventory, promotions)
 
 
 urlpatterns = [
@@ -32,5 +32,7 @@ urlpatterns = [
     path("user/all", get_user_business),
     path("inventory/add", add_data_to_inventory),
     path('inventory/all',get_items_inventory),
-    path('category/all',get_all_categories)
+    path('category/all',get_all_categories),
+    path('inventory/<uuid:id>',delete_inventory),
+    path('promotions',promotions),
 ]

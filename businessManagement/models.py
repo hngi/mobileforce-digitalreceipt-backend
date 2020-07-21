@@ -39,12 +39,13 @@ class Receipts(models.Model):
     partPayment = models.BooleanField(null=True, default=False)
     partPaymentDateTime = models.DateTimeField(null=True, default=datetime.now)
     currency = models.CharField(max_length=14, null=True)
+    sellerName = models.CharField(max_length=120, null=True)
     customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=True)
 
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, unique=True, null=False)
+    name = models.CharField(max_length=100, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
@@ -60,6 +61,7 @@ class Products(models.Model):
     tax_amount = models.FloatField(null=False, validators=[MinValueValidator(0)], default=Decimal('0.00'))
     discount = models.DecimalField(decimal_places=2, max_digits=10, default=Decimal('0.00'))
     updated_at = models.DateTimeField(auto_now=True)
+    unit = models.CharField(max_length=20, null=True)
 
 
 class Notifications(models.Model):
@@ -90,5 +92,14 @@ class Inventory(models.Model):
     quantity = models.PositiveIntegerField(
         null=False, validators=[MinValueValidator(1)]
     )
-    price = models.FloatField(null=False, validators=[MinValueValidator(0)],default=Decimal('0.00'))
+    unit = models.CharField(max_length=20, null=True)
+    price = models.FloatField(null=False, validators=[MinValueValidator(0)], default=Decimal('0.00'))
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    tax_amount = models.FloatField(null=False, validators=[MinValueValidator(0)], default=Decimal('0.00'))
+    discount = models.DecimalField(decimal_places=2, max_digits=10, default=Decimal('0.00'))
+
+
+class Promotions(models.Model):
+    imageUrl = models.CharField(null=True, max_length=1000)
+    text = models.CharField(null=True, max_length=1000)
+    link = models.CharField(null=True, max_length=1000)

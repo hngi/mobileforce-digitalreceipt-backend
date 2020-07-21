@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from .models import CustomerDetails
 from .serializers import CustomersSerializer
 from rest_framework.decorators import api_view
+from businessManagement.models import Receipts
 
 
 @api_view(['POST'])
@@ -39,15 +40,14 @@ def get_customer(request, id):
             }, status=status.HTTP_400_BAD_REQUEST)
     if request.method == "DELETE":
         try:
-
             customer = CustomerDetails.objects.filter(user=request.user_id, id=id)
-            customer.delete()
+            if len(customer)==0:
+                return JsonResponse(
+                    {"error": " no customer found"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            customer.update(active=False)
             return JsonResponse({"data": "customer deleted successfully"}, status=status.HTTP_200_OK)
-        except CustomerDetails.DoesNotExist:
-            return JsonResponse(
-                {"error": "Could not delete, no customer found"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         except Exception as error:
             return JsonResponse({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -56,7 +56,7 @@ def get_customer(request, id):
 def all_customers(request):
     if request.method == 'GET':
         try:
-            customer = CustomerDetails.objects.filter(user=request.user_id).order_by('name')
+            customer = CustomerDetails.objects.filter(user=request.user_id,active=True).order_by('name')
             customers = CustomersSerializer(customer, many=True).data
             return JsonResponse({
                 "data": customers

@@ -13,9 +13,9 @@ from customers.models import CustomerDetails
 from customers.serializers import CustomersSerializer
 from userManagement.models import User
 from userManagement.serializers import UserSerializer
-from .models import Receipts, Products, BusinessInfo, Notifications, Inventory, Category
+from .models import Receipts, Products, BusinessInfo, Notifications, Inventory, Category, Promotions
 from .serializers import ReceiptSerializer, ProductSerializer, BusinessInfoSerializer, NotificationsSerializer, \
-    InventorySerializer, CategorySerializer
+    InventorySerializer, CategorySerializer, PromotionsSerializer
 
 
 def add_one_to_receipt_number(user):
@@ -105,7 +105,9 @@ def get_all_receipt(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * c["quantity"] for c in data["products"]
+                        (float(c["unit_price"]) * (100 - float(c["discount"])) / 100 * float(c["quantity"]))
+                        + float(c["tax_amount"])
+                        for c in data["products"]
                     )
                 return JsonResponse(
                     {"message": "Retreived all receipts", "data": receipts},
@@ -143,7 +145,9 @@ def get_all_draft_receipt(request):
                     customer = CustomerDetails.objects.get(pk=data["customer"])
                     data["customer"] = CustomersSerializer(customer, many=False).data
                     data["total"] = sum(
-                        c["unit_price"] * c["quantity"] for c in data["products"]
+                        (float(c["unit_price"]) * (100 - float(c["discount"])) / 100 * float(c["quantity"]))
+                        + float(c["tax_amount"])
+                        for c in data["products"]
                     )
                 return JsonResponse(
                     {
@@ -239,25 +243,23 @@ def customize_receipt(request):
             productData = request.data["products"]
             for product in productData:
                 cat = Category.objects.filter(name=product['category_name'])
-                if len(cat) == 0:
-                    return JsonResponse(
-                        {"error": "There is no category with this name"}, status=status.HTTP_400_BAD_REQUEST,
-                    )
-                catSerializer = CategorySerializer(cat[0]).data
-                inventory = Inventory.objects.filter(category=catSerializer['id'], name=product['name'])
-                if len(inventory) == 0:
-                    return JsonResponse(
-                        {"error": "There are no items in inventory with this product"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-                invSerializer = InventorySerializer(inventory[0]).data
-                print(invSerializer['quantity'])
-                if invSerializer['quantity'] < product['quantity']:
-                    return JsonResponse(
-                        {"error": "There are less number of products in inventory"}, status=status.HTTP_400_BAD_REQUEST,
-                    )
-                product['categoryId'] = catSerializer['id']
-                product['unit_price'] = float(invSerializer['price'])
+                if len(cat) != 0:
+                    catSerializer = CategorySerializer(cat[0]).data
+                    inventory = Inventory.objects.filter(category=catSerializer['id'], name=product['name'])
+                    if len(inventory) != 0:
+                        invSerializer = InventorySerializer(inventory[0]).data
+                        print(invSerializer['quantity'])
+                        if invSerializer['quantity'] < product['quantity']:
+                            return JsonResponse(
+                                {"error": "There are less number of products in inventory"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                            )
+                        product['categoryId'] = catSerializer['id']
+                        product['unit'] = invSerializer['unit']
+                        if 'tax_amount' not in product:
+                            product['tax_amount'] = float(invSerializer['tax_amount'])
+                        if 'discount' not in product:
+                            product['discount'] = float(invSerializer['discount'])
             customerData = request.data["customer"]
             customerData["user"] = request.user_id
             cust = CustomerDetails.objects.filter(email=request.data["customer"]['email'], user=request.user_id)
@@ -269,7 +271,22 @@ def customize_receipt(request):
                     customerSerializer.save()
             cust = CustomerDetails.objects.get(email=request.data["customer"]['email'], user=request.user_id)
             customerSerializer = CustomersSerializer(cust)
+
             receiptData = request.data["receipt"]
+
+            data = {
+                "user": request.user_id,
+            }
+            if "receipt_number" in receiptData:
+                data["receipt_number"] = "AG-" + request.data["receipt_number"]
+            else:
+                data["receipt_number"] = add_one_to_receipt_number(request.user_id)
+
+            serializer = ReceiptSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                receiptData["id"] = serializer.data['id']
+
             receiptData["user"] = request.user_id
             productData = request.data["products"]
 
@@ -294,10 +311,11 @@ def customize_receipt(request):
                         serailizer.save()
 
                 for product in productData:
-                    inventory = Inventory.objects.get(category=product['categoryId'], name=product['name'])
-                    invSerializer = InventorySerializer(inventory).data
-                    inventory.quantity = invSerializer['quantity'] - product["quantity"]
-                    inventory.save()
+                    if "categoryId" in product:
+                        inventory = Inventory.objects.get(category=product['categoryId'], name=product['name'])
+                        invSerializer = InventorySerializer(inventory).data
+                        inventory.quantity = invSerializer['quantity'] - product["quantity"]
+                        inventory.save()
                     product["receipt"] = receiptSerailizer.data["id"]
 
                 productSerializer = ProductSerializer(data=productData, many=True)
@@ -478,6 +496,18 @@ def add_data_to_inventory(request):
             return JsonResponse(
                 {"error": "Enter price"}, status=status.HTTP_400_BAD_REQUEST
             )
+        if "unit" not in request.data:
+            return JsonResponse(
+                {"error": "Enter unit"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if "tax_amount" not in request.data:
+            return JsonResponse(
+                {"error": "Enter tax_amount"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if "discount" not in request.data:
+            return JsonResponse(
+                {"error": "Enter discount"}, status=status.HTTP_400_BAD_REQUEST
+            )
         try:
             cat = Category.objects.get(name=request.data['category_name'], user=request.user_id)
             categoryData = CategorySerializer(cat)
@@ -488,7 +518,10 @@ def add_data_to_inventory(request):
             })
             if categoryData.is_valid():
                 categoryData.save()
-            cat = Category.objects.get(name=request.data['category_name'])
+            print(categoryData.errors)
+            cat = Category.objects.get(name=request.data['category_name'], user=request.user_id)
+            categoryData = CategorySerializer(cat)
+            print(categoryData)
         try:
             inventory = Inventory.objects.get(name=request.data['product_name'], category=categoryData.data['id'],
                                               user=request.user_id)
@@ -499,7 +532,10 @@ def add_data_to_inventory(request):
                 'category': categoryData.data['id'],
                 'quantity': request.data['quantity'],
                 'user': request.user_id,
-                'price': request.data['price']
+                'price': request.data['price'],
+                'unit': request.data['unit'],
+                'tax_amount': request.data['tax_amount'],
+                'discount': request.data['discount'],
             }
             inventoryData = InventorySerializer(data=inventoryData)
             if inventoryData.is_valid():
@@ -509,9 +545,110 @@ def add_data_to_inventory(request):
         else:
             quantity = inventoryData.data['quantity']
             inventory.quantity = quantity + float(request.data['quantity'])
-            inventory.category = categoryData.data['id']
+            inventory.category = Category.objects.get(name=request.data['category_name'], user=request.user_id)
             inventory.price = request.data['price']
             inventory.name = request.data['product_name']
+            inventory.unit = request.data['unit']
+            inventory.tax_amount = request.data['tax_amount']
+            inventory.discount = request.data['discount']
             inventory.save()
             inventoryData = InventorySerializer(inventory)
             return JsonResponse({"data": inventoryData.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE', 'PUT'])
+def delete_inventory(request, id):
+    print(id)
+    if request.method == "DELETE":
+        try:
+            inventory = Inventory.objects.filter(id=id)
+            if len(inventory) == 0:
+                return JsonResponse({"errors": "Inventory does not exists"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                inventory.delete()
+                return JsonResponse({"data": "Inventory deleted successfully"}, status=status.HTTP_200_OK)
+        except Exception as error:
+            return JsonResponse({"errors": error}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "PUT":
+        try:
+            inventory = Inventory.objects.filter(id=id)
+            if len(inventory) == 0:
+                return JsonResponse({"errors": "Inventory does not exists"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                inventoryData = InventorySerializer(inventory[0])
+                inventory = Inventory.objects.get(id=id)
+                if "quantity" in request.data:
+                    quantity = inventoryData.data['quantity']
+                    inventory.quantity = float(request.data['quantity'])
+                    print(inventory.quantity)
+                if "category_name" in request.data:
+                    inventory.category = Category.objects.get(name=request.data['category_name'], user=request.user_id)
+                if "price" in request.data:
+                    inventory.price = request.data['price']
+                if "product_name" in request.data:
+                    inventory.name = request.data['product_name']
+                if "unit" in request.data:
+                    inventory.unit = request.data['unit']
+                if "tax_amount" in request.data:
+                    inventory.tax_amount = request.data['tax_amount']
+                if "discount" in request.data:
+                    inventory.discount = request.data['discount']
+                inventory.save()
+                inventoryData = InventorySerializer(inventory)
+                return JsonResponse({"data": inventoryData.data}, status=status.HTTP_200_OK)
+        except Exception as error:
+            return JsonResponse({"errors": error}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE', 'PUT', 'GET'])
+def promotions(request):
+    if request.method == "DELETE":
+        try:
+            inventory = Promotions.objects.filter()
+            if len(inventory) == 0:
+                return JsonResponse({"errors": "Promotions does not exists"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                inventory.delete()
+                return JsonResponse({"data": "Promotions deleted successfully"}, status=status.HTTP_200_OK)
+        except Exception as error:
+            return JsonResponse({"errors": error}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "PUT":
+        try:
+            promotions = Promotions.objects.filter()
+            if len(promotions) == 0:
+                if "imageUrl" not in request.data:
+                    return JsonResponse({"errors": "Enter imageUrl"}, status=status.HTTP_400_BAD_REQUEST)
+                if "text" not in request.data:
+                    return JsonResponse({"errors": "Enter text"}, status=status.HTTP_400_BAD_REQUEST)
+                if "link" not in request.data:
+                    return JsonResponse({"errors": "Enter link"}, status=status.HTTP_400_BAD_REQUEST)
+                promotion = PromotionsSerializer(data={
+                    'imageUrl': request.data['imageUrl'],
+                    'text': request.data['text'],
+                    'link': request.data['link'],
+                })
+                if promotion.is_valid():
+                    promotion.save()
+                    return JsonResponse({"data": promotion.data}, status=status.HTTP_200_OK)
+                return JsonResponse({"errors": promotion.errors}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                promotionsData = PromotionsSerializer(promotions[0])
+                if "imageUrl" in request.data:
+                    promotions[0].imageUrl = request.data['imageUrl']
+                if "text" in request.data:
+                    promotions[0].text = request.data['text']
+                if "link" in request.data:
+                    promotions[0].link = request.data['link']
+                promotions[0].save()
+                promotions = Promotions.objects.get()
+                promotionsData = PromotionsSerializer(promotions)
+                return JsonResponse({"data": promotionsData.data}, status=status.HTTP_200_OK)
+        except Exception as error:
+            return JsonResponse({"errors": error}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "GET":
+        promotions = Promotions.objects.filter()
+        if len(promotions) == 0:
+            return JsonResponse({"errors": "There is no promotion created"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            promotion = PromotionsSerializer(promotions[0])
+            return JsonResponse({"data": promotion.data}, status=status.HTTP_200_OK)
