@@ -1,8 +1,11 @@
 from django.urls import path
-from .views import create_promotion, update_promotion, delete_promotion
+from .views import (
+	create_promotion, 
+	update_promotion, 
+	delete_promotion)
 
 urlpatterns = [
-    path("promotion/create", create_promotion),
-    path("promotion/update", update_promotion),
-    path("promotion/<int:id>", delete_promotion),
+    path("create", create_promotion),
+    path("update", update_promotion),
+    path("<int:id>", delete_promotion),
 ]

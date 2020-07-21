@@ -139,8 +139,8 @@ def get_all_receipt(request):
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET"])
-def get_all_draft_receipt(request):
+@api_view(["GET", "DELETE"])
+def get_all_draft_receipt(request, id):
     # send the receipt id
     if request.method == "GET":
         try:
@@ -186,6 +186,24 @@ def get_all_draft_receipt(request):
         except Exception as error:
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
+    if request.method == "DELETE":
+        try:
+            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False, id=id)
+            if len(draftReceipt) == 0:
+                return JsonResponse(
+                    {"message": "Could not delete draft receipt, no receipt found"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            else:
+                draftReceipt.delete()
+                return JsonResponse(
+                    {"message": "Draft receipt deleted successfully"},
+                    status=status.HTTP_200_OK
+                )
+                
+        except Exception as error:
+            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["PUT"])
 def update_draft_receipt(request):
