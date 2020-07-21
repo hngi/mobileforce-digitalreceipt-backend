@@ -84,8 +84,8 @@ def add_product_info_to_receipt(request):
             "quantity": request.data["quantity"],
             "unit": request.data["unit"],
             "unit_price": request.data["unit_price"],
-            "tax_amount": request.data.get("tax_amount", 0.00),
-            "discount": request.data.get("discount", 0.00),
+            "tax_amount": request.data["tax_amount"],
+            "discount": request.data["discount"],
         }
         serializer = ProductSerializer(data=data)
         if serializer.is_valid():
@@ -577,3 +577,59 @@ def add_data_to_inventory(request):
             inventory.save()
             inventoryData = InventorySerializer(inventory)
             return JsonResponse({"data": inventoryData.data}, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE", "PUT"])
+def update_inventory(request, id):
+    if request.method == "DELETE":
+        try:
+            inventory = Inventory.objects.filter(id=id)
+            if len(inventory) == 0:
+                return JsonResponse(
+                    {"errors": "Inventory does not exists"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                inventory.delete()
+                return JsonResponse(
+                    {"data": "Inventory deleted successfully"},
+                    status=status.HTTP_200_OK,
+                )
+        except Exception as error:
+            return JsonResponse({"errors": error}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "PUT":
+        try:
+            inventory = Inventory.objects.filter(id=id)
+            if len(inventory) == 0:
+                return JsonResponse(
+                    {"errors": "Inventory does not exists"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                inventoryData = InventorySerializer(inventory[0])
+                inventory = Inventory.objects.get(id=id)
+                if "quantity" in request.data:
+                    quantity = inventoryData.data["quantity"]
+                    inventory.quantity = quantity + float(request.data["quantity"])
+                    print(inventory.quantity)
+                if "category_name" in request.data:
+                    inventory.category = Category.objects.get(
+                        name=request.data["category_name"], user=request.user_id
+                    )
+                if "price" in request.data:
+                    inventory.price = request.data["price"]
+                if "product_name" in request.data:
+                    inventory.name = request.data["product_name"]
+                if "unit" in request.data:
+                    inventory.unit = request.data["unit"]
+                if "tax_amount" in request.data:
+                    inventory.tax_amount = request.data["tax_amount"]
+                if "discount" in request.data:
+                    inventory.discount = request.data["discount"]
+                inventory.save()
+                inventoryData = InventorySerializer(inventory)
+                return JsonResponse(
+                    {"data": inventoryData.data}, status=status.HTTP_200_OK
+                )
+        except Exception as error:
+            return JsonResponse({"errors": error}, status=status.HTTP_400_BAD_REQUEST)
