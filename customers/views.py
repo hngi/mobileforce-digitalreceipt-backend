@@ -44,6 +44,9 @@ def get_customer(request, id):
                 user=request.user_id, customer=id
             )
             if customer:
+                customer.active = False
+                customer.save()
+
                 if len(customer_receipts) == 0:
                     customer.delete()
                     return JsonResponse(
