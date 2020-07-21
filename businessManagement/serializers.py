@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Receipts, Products, Notifications, BusinessInfo, Inventory, Category
+from .models import Receipts, Products, Notifications, BusinessInfo, Inventory, Category, Promotions
 
 
 # class BusinessSerializer(serializers.ModelSerializer):
@@ -18,6 +18,12 @@ class ReceiptSerializer(serializers.ModelSerializer):
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
+        fields = '__all__'
+
+
+class PromotionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promotions
         fields = '__all__'
 
 
