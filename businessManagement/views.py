@@ -127,7 +127,7 @@ def get_all_draft_receipt(request):
     # send the receipt id
     if request.method == "GET":
         try:
-            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False)
+            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False,active=True)
             if draftReceipt:
                 user = User.objects.get(id=request.user_id)
                 userData = UserSerializer(user, many=False).data
@@ -185,6 +185,21 @@ def delete_draft(request, id):
         except Exception as error:
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['DELETE'])
+def delete_receipt(request, id):
+    if request.method == "DELETE":
+        draftReceipt = Receipts.objects.filter(id=id,active=True)
+        if len(draftReceipt) == 0:
+            return JsonResponse({"message": "There is no  receipt with this id"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        if draftReceipt[0].issued:
+            return JsonResponse({"message": "cannot delete receipt its already issued"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            draftReceipt.update(active=False)
+            return JsonResponse({"message": "Deleted receipt successfully"}, status=status.HTTP_200_OK)
+
+
 @api_view(["PUT"])
 def update_draft_receipt(request):
     if request.method == "PUT":
@@ -195,7 +210,7 @@ def update_draft_receipt(request):
                 )
 
             receiptId = request.data["receiptId"]
-            draftReceipt = Receipts.objects.get(id=receiptId, issued=False)
+            draftReceipt = Receipts.objects.get(id=receiptId, issued=False,active=True)
             draftReceipt.issued = True
             draftReceipt.save()
             updateReceipt = ReceiptSerializer(draftReceipt)

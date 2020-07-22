@@ -49,7 +49,6 @@ urlpatterns = [
     path("v1/user/", include("userManagement.urls")),
     path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path("google", views.GoogleView.as_view(), name="google"),
-    path("v1/promotion/", include("promotions.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
