@@ -15,10 +15,11 @@ from .views import (
     update_draft_receipt,
     get_receipt_id,
     get_user_business,
-    add_data_to_inventory, get_all_categories, get_items_inventory, delete_inventory, promotions)
+    add_data_to_inventory, get_all_categories, get_items_inventory, delete_inventory, promotions, delete_receipt)
 
 
 urlpatterns = [
+    path("receipt/<uuid:id>", delete_receipt),
     path("receipt/create", create_receipt),
     path("receipt/product", add_product_info_to_receipt),
     path("receipt/issued", get_all_receipt),
