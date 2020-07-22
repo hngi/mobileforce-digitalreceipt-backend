@@ -164,6 +164,26 @@ def get_all_draft_receipt(request):
         except Exception as error:
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["DELETE"])
+def delete_draft(request, id):
+    if request.method == "DELETE":
+        try:
+            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False, id=id)
+            if len(draftReceipt) == 0:
+                return JsonResponse(
+                    {"message": "Could not delete draft receipt, no receipt found"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            else:
+                draftReceipt.delete()
+                return JsonResponse(
+                    {"message": "Draft receipt deleted successfully"},
+                    status=status.HTTP_200_OK
+                )
+                
+        except Exception as error:
+            return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["PUT"])
 def update_draft_receipt(request):
@@ -582,6 +602,7 @@ def delete_inventory(request, id):
                     inventory.quantity = float(request.data['quantity'])
                     print(inventory.quantity)
                 if "category_name" in request.data:
+
                     inventory.category = Category.objects.get(name=request.data['category_name'], user=request.user_id)
                 if "price" in request.data:
                     inventory.price = request.data['price']

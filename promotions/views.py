@@ -5,12 +5,10 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
-# Create your views here.
-#  delete,update
 
 
 @api_view(["POST"])
-def add_promotion(request):
+def create_promotion(request):
     if request.method == "POST":
 
         if "image_url" not in request.data:
@@ -58,8 +56,8 @@ def delete_promotion(request, id):
             pass
 
 
-@api_view("PUT")
-def update_promotion(request):
+@api_view(["PUT"])
+def update_promotion(request, id):
     if request.method == "PUT":
         try:
             if "promotion_id" not in request.data:
