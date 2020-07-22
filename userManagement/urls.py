@@ -12,7 +12,7 @@ from .views import (
     forgot_password,
     get_all_notifications,
     user_send_email_pdf,
-    get_user_details, user_send_email)
+    get_user_details, user_send_email, send_notifications_all_now)
 
 urlpatterns = [
     path("otp_register", user_registration_send_email),
@@ -26,6 +26,7 @@ urlpatterns = [
     path("logout", logout),
     path("notification/create", create_notification),
     path("notification/all", get_all_notifications),
+    path("notification", send_notifications_all_now),
     path("notification/create/send/now", send_notification_now),
     path("sendemail/pdf",user_send_email_pdf)
 ]
