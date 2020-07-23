@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Promotions
-from .serializers import PromotionSerializer
+from businessManagement.models import Promotions
+from businessManagement.serializers import PromotionsSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
@@ -29,7 +29,7 @@ def create_promotion(request):
             "text": request.data["text"],
             "link": request.data["link"],
         }
-        serializer = PromotionSerializer(data=data)
+        serializer = PromotionsSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=status.HTTP_200_OK)
@@ -73,7 +73,7 @@ def update_promotion(request, id):
             promotion.text = request.data["text"]
             promotion.link = request.data["link"]
             promotion.save()
-            updatePromotion = PromotionSerializer(promotion)
+            updatePromotion = PromotionsSerializer(promotion)
             return JsonResponse({"data": updatePromotion}, status=status.HTTP_200_OK)
 
         except Promotions.DoesNotExist:

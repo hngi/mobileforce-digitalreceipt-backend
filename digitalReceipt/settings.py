@@ -40,10 +40,14 @@ INSTALLED_APPS = [
     'businessManagement.apps.BusinessmanagementConfig',
     'customers.apps.customersConfig',
     'userManagement.apps.UsermanagementConfig',
-    "promotions.apps.PromotionsConfig",
+    #"promotions.apps.PromotionsConfig",
     'oauthlogin.apps.OauthloginConfig',
     'drf_yasg',
-    "fcm_django"
+    "fcm_django",
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'digitalReceipt.middleware.authMiddleWare.AuthorizationMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'digitalReceipt.urls'
@@ -70,6 +75,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -141,3 +148,49 @@ FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": "AAAAMRXIXr0:APA91bGZWkJaJClsj91nx_wmwKyYYzl7BU287NjGVmKV7ZY5Xmxyt11ptjZZXtlaFvsuDRE3wXaOK6hWIcHd8hY93MXlwhcxI3U5Gz_u0zvOQ8g9VZzHBQI4Uef4CA3FRYY0OOEXzijL",
 }
 
+REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+        
+        # OAuth
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+    )
+}
+
+AUTHENTICATION_BACKENDS = (
+
+    # Facebook OAuth2
+    'social_core.backends.facebook.FacebookAppOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+
+    # django-rest-framework-social-oauth2
+    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+
+)
+
+SOCIAL_AUTH_FACEBOOK_KEY = int('307015977114466')
+SOCIAL_AUTH_FACEBOOK_SECRET = str('8a1c3a216d92ccdd6bc2f364b8bc86ef')
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+'fields': 'id, name, email' }
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+FACEBOOK_EXTENDED_PERMISSIONS = ['email']
+SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'email']
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
+
+SOCIAL_AUTH_PIPELINE = (
+'social_core.pipeline.social_auth.social_details',
+'social_core.pipeline.social_auth.social_uid',
+'social_core.pipeline.social_auth.auth_allowed',
+'social_core.pipeline.social_auth.social_user',
+'social_core.pipeline.user.get_username',
+'social_core.pipeline.social_auth.associate_by_email',
+'social_core.pipeline.user.create_user',
+'social_core.pipeline.social_auth.associate_user',
+'social_core.pipeline.social_auth.load_extra_data',
+'social_core.pipeline.user.user_details', )

@@ -15,7 +15,10 @@ from businessManagement.serializers import NotificationsSerializer
 from digitalReceipt import settings
 from services.email_verification import Gmail
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, SocialSerializer
+from social_django.utils import load_strategy, load_backend
+from social_core.backends.oauth import BaseOAuth2
+from social_core.exceptions import MissingBackend, AuthTokenError, AuthForbidden
 
 
 def otpgen():
@@ -322,6 +325,68 @@ def login(request):
             )
         except Exception as e:
             return JsonResponse({"error": e}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["POST"])
+def sociallogin(self, request):
+    serializer_class = serializers.SocialSerializer
+    permission_classes = [permission.AllowAny]
+    serializer = self.serializer_class(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    provider = serializer.data.get('provider')
+    strategy = load_strategy(request)
+
+    try:
+        backend = load_backend(strategy= strategy, name=provider, redirect_uri=None)
+    except MissingBackend:
+        return JsonResponse(
+            {"error": "Please provide a valid provider"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        if isinstance(backend, BaseOAuth2):
+            token= serializer.data.get('token')
+        user = backend.do_auth(token)
+    except Exception as error:
+        return JsonResponse(
+            {"error":{
+                "access_token": "Invalid token",
+                "details": str(error)
+            }
+
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except AuthTokenError as error:
+        return JsonResponse(
+            {"error": "Invalid credentials",
+            "details": str(error)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        authenticated_user = backend.do_auth(token, user=user)
+
+    except Exception as error:
+        return JsonResponse(
+            {"error": "Invalid token",
+            "details": str(error)        
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except AuthForbidden as error:
+        return JsonResponse(
+            {"error" :"Invalid token",
+            "details": str(error)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if authenticated_user and authenticated_user.is_active:
+        login(request, authenticated_user)
+        data={
+            "token": token
+        }
+
+        response = {
+            "email": authenticated_user.email,
+            "username": authenticated_user.username,
+            "token": data.get('token')
+        }
+        return JsonResponse(status=status.HTTP_200_OK, data= response)
 
 
 @api_view(["PUT"])
