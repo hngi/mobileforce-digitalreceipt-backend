@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'businessManagement.apps.BusinessmanagementConfig',
     'customers.apps.customersConfig',
     'userManagement.apps.UsermanagementConfig',
-    "promotions.apps.PromotionsConfig",
     'oauthlogin.apps.OauthloginConfig',
     'drf_yasg',
-    "fcm_django"
+    "fcm_django",
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +141,10 @@ FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": "AAAAMRXIXr0:APA91bGZWkJaJClsj91nx_wmwKyYYzl7BU287NjGVmKV7ZY5Xmxyt11ptjZZXtlaFvsuDRE3wXaOK6hWIcHd8hY93MXlwhcxI3U5Gz_u0zvOQ8g9VZzHBQI4Uef4CA3FRYY0OOEXzijL",
 }
 
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
