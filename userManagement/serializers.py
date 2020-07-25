@@ -11,6 +11,4 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SocialSerializer(serializers.Serializer):
 	provider = 'facebook'
-	for user in User.objects.all():
-		tokens = Token.objects.get_or_create(user=user, trim_whitespace=True)
-		token = token.key
+	access_token = serializers.CharField(max_length=4096, required=True, trim_whitespace=True)

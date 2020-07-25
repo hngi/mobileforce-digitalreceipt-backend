@@ -4,7 +4,6 @@ from .views import (
     user_registration_send_email,
     create_user,
     login,
-    sociallogin,
     change_password,
     check_if_user_exists,
     create_notification,
@@ -18,8 +17,7 @@ from .views import (
 urlpatterns = [
     path("otp_register", user_registration_send_email),
     path("register", create_user),
-    path("login", login),
-    path('oauth/login/', sociallogin),
+    path("login", login),   
     path("change_password", change_password),
     path('send_email',user_send_email),
     path("forgot_password", forgot_password),

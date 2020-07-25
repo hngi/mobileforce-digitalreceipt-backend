@@ -26,6 +26,7 @@ from . import settings
 from .cron.notification import start
 
 from oauthlogin import views
+from userManagement.views import SocialLoginView
 
 
 schema_view = get_schema_view(
@@ -49,6 +50,7 @@ urlpatterns = [
     path("v1/user/", include("userManagement.urls")),
     path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path("google", views.GoogleView.as_view(), name="google"),
+    path('facebook/login/', SocialLoginView.as_view(), name='facebook'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
