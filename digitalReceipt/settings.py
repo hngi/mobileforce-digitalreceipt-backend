@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'businessManagement.apps.BusinessmanagementConfig',
     'customers.apps.customersConfig',
     'userManagement.apps.UsermanagementConfig',
-    "promotions.apps.PromotionsConfig",
     'oauthlogin.apps.OauthloginConfig',
     'drf_yasg',
     "fcm_django"
