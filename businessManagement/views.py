@@ -95,8 +95,8 @@ def get_all_receipt(request):
                 for data in receipts:
                     data["user"] = {
                         "id": userData["id"],
-                        "name": userData["name"],
-                        "email_address": userData["email_address"],
+                        "name": userData["username"],
+                        "email_address": userData["email"],
                     }
                     products = Products.objects.filter(receipt=data["id"])
                     products_data = ProductSerializer(products, many=True).data
@@ -127,7 +127,7 @@ def get_all_draft_receipt(request):
     # send the receipt id
     if request.method == "GET":
         try:
-            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False,active=True)
+            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False, active=True)
             if draftReceipt:
                 user = User.objects.get(id=request.user_id)
                 userData = UserSerializer(user, many=False).data
@@ -135,8 +135,8 @@ def get_all_draft_receipt(request):
                 for data in draftReceipts:
                     data["user"] = {
                         "id": userData["id"],
-                        "name": userData["name"],
-                        "email_address": userData["email_address"],
+                        "name": userData["username"],
+                        "email_address": userData["email"],
                     }
                     products = Products.objects.filter(receipt=data["id"])
                     products_data = ProductSerializer(products, many=True).data
@@ -164,6 +164,7 @@ def get_all_draft_receipt(request):
         except Exception as error:
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(["DELETE"])
 def delete_draft(request, id):
     if request.method == "DELETE":
@@ -174,21 +175,22 @@ def delete_draft(request, id):
                     {"message": "Could not delete draft receipt, no receipt found"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-                
+
             else:
                 draftReceipt.delete()
                 return JsonResponse(
                     {"message": "Draft receipt deleted successfully"},
                     status=status.HTTP_200_OK
                 )
-                
+
         except Exception as error:
             return JsonResponse({"message": error}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['DELETE'])
 def delete_receipt(request, id):
     if request.method == "DELETE":
-        draftReceipt = Receipts.objects.filter(id=id,active=True)
+        draftReceipt = Receipts.objects.filter(id=id, active=True)
         if len(draftReceipt) == 0:
             return JsonResponse({"message": "There is no  receipt with this id"},
                                 status=status.HTTP_400_BAD_REQUEST)
@@ -210,7 +212,7 @@ def update_draft_receipt(request):
                 )
 
             receiptId = request.data["receiptId"]
-            draftReceipt = Receipts.objects.get(id=receiptId, issued=False,active=True)
+            draftReceipt = Receipts.objects.get(id=receiptId, issued=False, active=True)
             draftReceipt.issued = True
             draftReceipt.save()
             updateReceipt = ReceiptSerializer(draftReceipt)
@@ -512,6 +514,28 @@ def get_items_inventory(request):
         return JsonResponse({"data": inventorySerializer.data}, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+def get_part_payment(request):
+    if request.method == "GET":
+        partpayments = Receipts.objects.filter(user=request.user_id, partPayment=True)
+        serializer = ReceiptSerializer(partpayments, many=True)
+        return JsonResponse({"data": serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(["PUT"])
+def update_part_payment(request,id):
+    if request.method == "PUT":
+        options={}
+        if "partPayment" in request.data:
+            options['partPayment']=request.data['partPayment']
+        if "partPaymentDateTime" in request.data:
+            options['partPaymentDateTime']=request.data['partPaymentDateTime']
+        partpayments = Receipts.objects.filter(id=id)
+        partpayments.update(**options)
+        serializer = ReceiptSerializer(partpayments, many=True)
+        return JsonResponse({"data": serializer.data}, status=status.HTTP_200_OK)
+
+
 @api_view(["POST"])
 def add_data_to_inventory(request):
     if request.method == "POST":
@@ -617,7 +641,6 @@ def delete_inventory(request, id):
                     inventory.quantity = float(request.data['quantity'])
                     print(inventory.quantity)
                 if "category_name" in request.data:
-
                     inventory.category = Category.objects.get(name=request.data['category_name'], user=request.user_id)
                 if "price" in request.data:
                     inventory.price = request.data['price']
@@ -658,11 +681,17 @@ def promotions(request):
                     return JsonResponse({"errors": "Enter text"}, status=status.HTTP_400_BAD_REQUEST)
                 if "link" not in request.data:
                     return JsonResponse({"errors": "Enter link"}, status=status.HTTP_400_BAD_REQUEST)
+                if "versionNumber" not in request.data:
+                    return JsonResponse({"errors": "Enter versionNumber"}, status=status.HTTP_400_BAD_REQUEST)
+
                 promotion = PromotionsSerializer(data={
                     'imageUrl': request.data['imageUrl'],
                     'text': request.data['text'],
                     'link': request.data['link'],
+                    "versionNumber":request.data['versionNumber'],
+                    "isPromotion": request.data['isPromotion'] if "isPromotion" in request.data else True
                 })
+
                 if promotion.is_valid():
                     promotion.save()
                     return JsonResponse({"data": promotion.data}, status=status.HTTP_200_OK)
@@ -675,6 +704,10 @@ def promotions(request):
                     promotions[0].text = request.data['text']
                 if "link" in request.data:
                     promotions[0].link = request.data['link']
+                if "versionNumber" in request.data:
+                    promotions[0].versionNumber = request.data['versionNumber']
+                if "isPromotion" in request.data:
+                    promotions[0].isPromotion = request.data['isPromotion']
                 promotions[0].save()
                 promotions = Promotions.objects.get()
                 promotionsData = PromotionsSerializer(promotions)

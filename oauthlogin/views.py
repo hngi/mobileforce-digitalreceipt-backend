@@ -1,5 +1,6 @@
 import datetime
 import jwt
+from django.contrib.auth import login
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
@@ -10,8 +11,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 import requests
-from userManagement.models import User
-from userManagement.serializers import UserSerializer
+from userManagement.models import User, UserToken, Token
+from userManagement.serializers import UserSerializer, UserTokenSerializer
 
 
 class HelloView(APIView):
@@ -22,24 +23,41 @@ class HelloView(APIView):
         return Response(content)
 
 
-def login(user):
-    user = User.objects.get(email_address=user['email_address'], password=user['password'])
-    userData = UserSerializer(user, many=False).data
-    userData['exp'] = datetime.datetime.utcnow() + datetime.timedelta(seconds=7 * 86400)
-    token = jwt.encode(userData, 'b&!_55_-n0p33)lx=#)$@h#9u13kxz%ucughc%k@w_^x0gyz!b', algorithm='HS256')
-    fcm_device = FCMDevice.objects.create(
-        type=userData['deviceType'],
-        registration_id=userData['registration_id'])
-    fcm_device.send_message(title="Notification", body="Login successful",
-                            data={"click_action": "FLUTTER_NOTIFICATION_CLICK"})
-    data = {
-        'message': 'Retreived token successfully',
-        'data': {
-            '_id': userData['id'],
-            'auth_token': token.decode("utf-8")
-        },
-        "status": status.HTTP_200_OK
-    }
+def loginUser(user,userData,request):
+    user = User.objects.get(email__exact=user['email'], is_active=True)
+    reg_id = request.data["registration_id"]
+    fcm_device = FCMDevice.objects.filter(
+            type=request.data["deviceType"], registration_id=reg_id
+    )
+
+    if len(fcm_device) == 0:
+        fcm_device = FCMDevice.objects.create(
+                type=request.data["deviceType"], registration_id=reg_id
+            )
+        tokenSerailizer = UserTokenSerializer(data={
+                'registration_id': reg_id,
+                'deviceType': request.data["deviceType"],
+                'user': user.id
+            })
+        if tokenSerailizer.is_valid():
+                tokenSerailizer.save()
+    else:
+        fcm_device = fcm_device[0]
+    userToken = UserToken.objects.get(registration_id=reg_id, deviceType=request.data["deviceType"])
+    # deleting the token if the user has already one
+    token = Token.objects.filter(user=user, userToken=userToken)
+    if len(token) == 0:
+        login(request, user)
+        token = Token.objects.create(user=request.user, userToken=userToken)
+    else:
+        token = token[0]
+    fcm_device.send_message(
+            title="Notification",
+            body="Login successful",
+            data={"click_action": "FLUTTER_NOTIFICATION_CLICK"},
+        )
+    userData = UserSerializer(user).data
+    data={"token": token.key, "user": userData}
     return data
 
 
@@ -64,29 +82,24 @@ class GoogleView(APIView):
             content = {'message': 'wrong google token / this google token is already expired.'}
             return Response(content)
         # create user if not exist
+        print(data)
         try:
-            User.objects.filter(email_address=data['email']).update(registration_id=request.data['registration_id'],
-                                                                    deviceType=request.data['deviceType'],
-                                                                    active=True)
-            user = User.objects.get(email_address=data['email'])
+            user = User.objects.get(email=data['email'])
             userData = UserSerializer(user, many=False).data
-            data = login(userData)
+            data = loginUser(userData,user,request)
             return JsonResponse(data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             user = {
-                'email_address': data['email'],
-                'name': data['email'],
-                'password': make_password(BaseUserManager().make_random_password()),
-                'registration_id': request.data['registration_id'],
-                'deviceType': request.data['deviceType'],
-                'active': True,
+                'email': data['email'],
+                'username': data['email'],
+                'password': data['email'],
             }
             serializer = UserSerializer(data=user)
             # provider random default password
             if serializer.is_valid():
                 serializer.save()
-                user = User.objects.get(email_address=data['email'])
+                user = User.objects.get(email=data['email'])
                 userData = UserSerializer(user, many=False).data
-                data = login(userData)
+                data = loginUser(userData,user,request)
                 return JsonResponse(data, status=status.HTTP_200_OK)
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -23,7 +23,7 @@ from rest_framework import permissions
 
 
 from . import settings
-from .cron.notification import start
+# from .cron.notification import start
 
 from oauthlogin import views
 

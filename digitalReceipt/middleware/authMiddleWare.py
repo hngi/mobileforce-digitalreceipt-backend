@@ -5,7 +5,7 @@ from django.http import HttpResponseForbidden, JsonResponse
 from fcm_django.models import FCMDevice
 from rest_framework import status
 
-from userManagement.models import User
+from userManagement.models import User, Token
 from userManagement.serializers import UserSerializer
 
 
@@ -15,9 +15,16 @@ class AuthorizationMiddleware(object):
 
     def __call__(self, request):
 
-        jwtEscapeUrls = ['/', '/v1/user/otp_register', '/v1/user/forgot_password', '/v1/user/email/exists','/v1/user/send_email',
-                         '/v1/user/register', '/v1/user/login', '/google']
+        jwtEscapeUrls = ['/', '/v1/user/otp_register', '/v1/user/forgot_password/', '/v1/user/email/exists',
+                         '/v1/user/send_email','/v1/user/notification','/v1/business/promotions',
+                         '/v1/user/register/', '/v1/user/login/', '/google', '/v1/user/questions/']
         if 'media' in request.path:
+            response = self.get_response(request)
+            return response
+        if 'admin' in request.path:
+            response = self.get_response(request)
+            return response
+        if 'device/logged' in request.path:
             response = self.get_response(request)
             return response
         if request.path in jwtEscapeUrls:
@@ -27,28 +34,18 @@ class AuthorizationMiddleware(object):
             header_token = request.META.get('HTTP_TOKEN', None)
             if header_token is not None:
                 try:
-                    vaildate_token = jwt.decode(header_token, "b&!_55_-n0p33)lx=#)$@h#9u13kxz%ucughc%k@w_^x0gyz!b",
-                                                algorithm='HS256')
-                    request.user_id = vaildate_token['id']
+                    token = Token.objects.filter(key=header_token)
+                    if len(token) == 0:
+                        return JsonResponse({"error": "Permission denied"},
+                                            status=status.HTTP_401_UNAUTHORIZED)
+                    request.user_id = token[0].user.id
+                    request.userToken_id = token[0].userToken.id
+                    request.key = header_token
                     user = User.objects.get(id=request.user_id)
                     userData = UserSerializer(user).data
-                    if userData['active']:
-                        if time.time() < vaildate_token['exp']:
-                            response = self.get_response(request)
-                            print(request.user_id)
-                            return response
-                        else:
-                            user = User.objects.filter(id=request.user_id).update(
-                                registration_id=None, deviceType=None, active=False
-                            )
-                            FCMDevice.objects.filter(
-                                type=userData["deviceType"], registration_id=userData["registration_id"]
-                            ).delete()
-                            return JsonResponse({"error": "Please Login to renew your session"},
-                                                status=status.HTTP_401_UNAUTHORIZED)
-                    else:
-                        return JsonResponse({"error": "Please Login inorder to view data"},
-                                            status=status.HTTP_401_UNAUTHORIZED)
+                    response = self.get_response(request)
+                    print(request.user_id)
+                    return response
                 except User.doesNotExist:
                     print("user does not exist")
                     return JsonResponse({"error": "Invalid session.Please login"},

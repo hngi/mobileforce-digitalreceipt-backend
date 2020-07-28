@@ -1,13 +1,13 @@
 from datetime import datetime
 from decimal import Decimal
 
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db import models
 import uuid
 
 # Create your models here.
 from customers.models import CustomerDetails
-from userManagement.models import User
 
 
 def user_directory_path(instance, filename):
@@ -36,11 +36,13 @@ class Receipts(models.Model):
     issued = models.BooleanField(null=True, default=False)
     deleted = models.BooleanField(null=True, default=False)
     signature = models.FileField(null=True, upload_to=user_directory_path)
+    platform = models.CharField(max_length=50, null=True)
     partPayment = models.BooleanField(null=True, default=False)
     partPaymentDateTime = models.DateTimeField(null=True, default=datetime.now)
     currency = models.CharField(max_length=14, null=True)
     sellerName = models.CharField(max_length=120, null=True)
     customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=True)
+    active = models.BooleanField(null=True, default=True)
 
 
 class Category(models.Model):
@@ -83,7 +85,8 @@ class BusinessInfo(models.Model):
     email_address = models.CharField(null=True, max_length=100)
     logo = models.FileField(null=True, upload_to=logo_directory_path)
     user = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
-
+    signature=models.CharField(max_length=200000, null=True)
+    currency=models.CharField(max_length=20, null=True)
 
 class Inventory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -103,3 +106,5 @@ class Promotions(models.Model):
     imageUrl = models.CharField(null=True, max_length=1000)
     text = models.CharField(null=True, max_length=1000)
     link = models.CharField(null=True, max_length=1000)
+    versionNumber = models.CharField(null=True, max_length=1000)
+    isPromotion = models.BooleanField(null=True, default=True)

@@ -25,7 +25,7 @@ SECRET_KEY = '8rn#wn+7=rtfs53wz!#)4(*0g361d^x97p79j75fzx=7^i^wlj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1']
+ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1','degeittest.pythonanywhere.com']
 
 
 # Application definition
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'userManagement.apps.UsermanagementConfig',
     'oauthlogin.apps.OauthloginConfig',
     'drf_yasg',
-    "fcm_django"
+    "fcm_django",
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -126,9 +127,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
-MEDIA_ROOT = '/home/degeitreceipt/bcknd/static/media'
+MEDIA_ROOT = '/home/degeittest/mobileforce-digitalreceipt-backend/static/media'
 
-STATIC_ROOT = '/home/degeitreceipt/bcknd/static'
+STATIC_ROOT = '/home/degeittest/mobileforce-digitalreceipt-backend/static'
 
 
 # No security issues occur in email the given password here is an app password
@@ -140,3 +141,10 @@ FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": "AAAAMRXIXr0:APA91bGZWkJaJClsj91nx_wmwKyYYzl7BU287NjGVmKV7ZY5Xmxyt11ptjZZXtlaFvsuDRE3wXaOK6hWIcHd8hY93MXlwhcxI3U5Gz_u0zvOQ8g9VZzHBQI4Uef4CA3FRYY0OOEXzijL",
 }
 
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
