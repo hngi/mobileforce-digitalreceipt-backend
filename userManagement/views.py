@@ -548,22 +548,6 @@ class UserAPIs(viewsets.GenericViewSet):
             return JsonResponse(
                 {"error": "Enter password"}, status=status.HTTP_400_BAD_REQUEST
             )
-        if "securityQuestion1" not in request.data:
-            return JsonResponse(
-                {"error": "Enter securityQuestion1"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        if "securityQuestion2" not in request.data:
-            return JsonResponse(
-                {"error": "Enter securityQuestion2"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        if "securityAnswer1" not in request.data:
-            return JsonResponse(
-                {"error": "Enter securityAnswer1"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        if "securityAnswer2" not in request.data:
-            return JsonResponse(
-                {"error": "Enter securityAnswer2"}, status=status.HTTP_400_BAD_REQUEST
-            )
         try:
             validate_email(request.data["email"])
         except ValidationError as e:
@@ -599,14 +583,18 @@ class UserAPIs(viewsets.GenericViewSet):
                 **user_data
             )
             userDetails = {
-                'securityQuestion1': request.data['securityQuestion1'],
-                'securityQuestion2': request.data['securityQuestion2'],
-                'securityAnswer1': request.data['securityAnswer1'],
-                'securityAnswer2': request.data['securityAnswer2'],
-                'user': user.id
             }
+            if "securityQuestion1" in request.data:
+                userDetails['securityQuestion1']=request.data['securityQuestion1']
+                if "securityAnswer1" in request.data:
+                    userDetails['securityAnswer1']=request.data['securityAnswer1']
+            if "securityQuestion2" in request.data:
+                userDetails['securityQuestion2']=request.data['securityQuestion2']
+                if "securityAnswer2" in request.data:
+                    userDetails['securityAnswer2']=request.data['securityAnswer2']
             if 'is_premium_user' in request.data:
                 userDetails['is_premium_user'] = request.data['is_premium_user']
+            userDetails['user'] = user.id
             serializer = UserDetailsSerializer(data=userDetails)
             if serializer.is_valid():
                 serializer.save()
@@ -614,6 +602,7 @@ class UserAPIs(viewsets.GenericViewSet):
             return Response(UserSerializer(instance=user).data, status=status.HTTP_201_CREATED)
         else:
             return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(detail=False, methods=['post'])
     def login(self, request):

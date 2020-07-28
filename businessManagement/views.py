@@ -525,8 +525,13 @@ def get_part_payment(request):
 @api_view(["PUT"])
 def update_part_payment(request,id):
     if request.method == "PUT":
+        options={}
+        if "partPayment" in request.data:
+            options['partPayment']=request.data['partPayment']
+        if "partPaymentDateTime" in request.data:
+            options['partPaymentDateTime']=request.data['partPaymentDateTime']
         partpayments = Receipts.objects.filter(id=id)
-        partpayments.update(partPayment=True)
+        partpayments.update(**options)
         serializer = ReceiptSerializer(partpayments, many=True)
         return JsonResponse({"data": serializer.data}, status=status.HTTP_200_OK)
 
@@ -678,12 +683,15 @@ def promotions(request):
                     return JsonResponse({"errors": "Enter link"}, status=status.HTTP_400_BAD_REQUEST)
                 if "versionNumber" not in request.data:
                     return JsonResponse({"errors": "Enter versionNumber"}, status=status.HTTP_400_BAD_REQUEST)
+
                 promotion = PromotionsSerializer(data={
                     'imageUrl': request.data['imageUrl'],
                     'text': request.data['text'],
                     'link': request.data['link'],
                     "versionNumber":request.data['versionNumber'],
+                    "isPromotion": request.data['isPromotion'] if "isPromotion" in request.data else True
                 })
+
                 if promotion.is_valid():
                     promotion.save()
                     return JsonResponse({"data": promotion.data}, status=status.HTTP_200_OK)
@@ -698,6 +706,8 @@ def promotions(request):
                     promotions[0].link = request.data['link']
                 if "versionNumber" in request.data:
                     promotions[0].versionNumber = request.data['versionNumber']
+                if "isPromotion" in request.data:
+                    promotions[0].isPromotion = request.data['isPromotion']
                 promotions[0].save()
                 promotions = Promotions.objects.get()
                 promotionsData = PromotionsSerializer(promotions)

@@ -20,10 +20,10 @@ class SecurityQuestion(models.Model):
 
 class UserDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=False, blank=True)
-    securityQuestion1 = models.CharField(max_length=1000, null=False)
-    securityQuestion2 = models.CharField(max_length=1000, null=False)
-    securityAnswer1 = models.CharField(max_length=1000, null=False)
-    securityAnswer2 = models.CharField(max_length=1000, null=False)
+    securityQuestion1 = models.CharField(max_length=1000, null=True)
+    securityQuestion2 = models.CharField(max_length=1000, null=True)
+    securityAnswer1 = models.CharField(max_length=1000, null=True)
+    securityAnswer2 = models.CharField(max_length=1000, null=True)
     is_premium_user = models.BooleanField(default=False, null=True)
 
 

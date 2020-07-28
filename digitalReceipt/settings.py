@@ -25,7 +25,7 @@ SECRET_KEY = '8rn#wn+7=rtfs53wz!#)4(*0g361d^x97p79j75fzx=7^i^wlj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1']
+ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1','degeittest.pythonanywhere.com']
 
 
 # Application definition
@@ -127,9 +127,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
-MEDIA_ROOT = '/home/degeitreceipt/bcknd/static/media'
+MEDIA_ROOT = '/home/degeittest/mobileforce-digitalreceipt-backend/static/media'
 
-STATIC_ROOT = '/home/degeitreceipt/bcknd/static'
+STATIC_ROOT = '/home/degeittest/mobileforce-digitalreceipt-backend/static'
 
 
 # No security issues occur in email the given password here is an app password

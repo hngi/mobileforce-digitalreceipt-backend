@@ -85,7 +85,8 @@ class BusinessInfo(models.Model):
     email_address = models.CharField(null=True, max_length=100)
     logo = models.FileField(null=True, upload_to=logo_directory_path)
     user = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
-
+    signature=models.CharField(max_length=200000, null=True)
+    currency=models.CharField(max_length=20, null=True)
 
 class Inventory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -106,3 +107,4 @@ class Promotions(models.Model):
     text = models.CharField(null=True, max_length=1000)
     link = models.CharField(null=True, max_length=1000)
     versionNumber = models.CharField(null=True, max_length=1000)
+    isPromotion = models.BooleanField(null=True, default=True)
