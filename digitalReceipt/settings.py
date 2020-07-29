@@ -25,7 +25,7 @@ SECRET_KEY = '8rn#wn+7=rtfs53wz!#)4(*0g361d^x97p79j75fzx=7^i^wlj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1']
+ALLOWED_HOSTS = ['degeitreceipt.pythonanywhere.com','127.0.0.1','degeittest.pythonanywhere.com']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'businessManagement.apps.BusinessmanagementConfig',
     'customers.apps.customersConfig',
     'userManagement.apps.UsermanagementConfig',
+<<<<<<< HEAD
     #"promotions.apps.PromotionsConfig",
     'oauthlogin.apps.OauthloginConfig',
     'drf_yasg',
@@ -48,6 +49,12 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'rest_framework.authtoken',
+=======
+    'oauthlogin.apps.OauthloginConfig',
+    'drf_yasg',
+    "fcm_django",
+    'rest_framework',
+>>>>>>> 120689d9b2395faa9a8212df332169679aae7637
 ]
 
 MIDDLEWARE = [
@@ -134,9 +141,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
-MEDIA_ROOT = '/home/degeitreceipt/bcknd/static/media'
+MEDIA_ROOT = '/home/degeittest/mobileforce-digitalreceipt-backend/static/media'
 
-STATIC_ROOT = '/home/degeitreceipt/bcknd/static'
+STATIC_ROOT = '/home/degeittest/mobileforce-digitalreceipt-backend/static'
 
 
 # No security issues occur in email the given password here is an app password
@@ -147,15 +154,8 @@ email_app_password = 'hosebgyqtuckqqkt'
 FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": "AAAAMRXIXr0:APA91bGZWkJaJClsj91nx_wmwKyYYzl7BU287NjGVmKV7ZY5Xmxyt11ptjZZXtlaFvsuDRE3wXaOK6hWIcHd8hY93MXlwhcxI3U5Gz_u0zvOQ8g9VZzHBQI4Uef4CA3FRYY0OOEXzijL",
 }
-
-REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
         
-        # OAuth
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework_social_oauth2.authentication.SocialAuthentication',
-    )
-}
+       
 
 AUTHENTICATION_BACKENDS = (
 
@@ -194,3 +194,13 @@ SOCIAL_AUTH_PIPELINE = (
 'social_core.pipeline.social_auth.associate_user',
 'social_core.pipeline.social_auth.load_extra_data',
 'social_core.pipeline.user.user_details', )
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+         # OAuth
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+    )
+}
