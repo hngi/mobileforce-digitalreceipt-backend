@@ -35,7 +35,7 @@ class Receipts(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     issued = models.BooleanField(null=True, default=False)
     deleted = models.BooleanField(null=True, default=False)
-    signature = models.FileField(null=True, upload_to=user_directory_path)
+    signature=models.CharField(max_length=200000, null=True)
     platform = models.CharField(max_length=50, null=True)
     partPayment = models.BooleanField(null=True, default=False)
     partPaymentDateTime = models.DateTimeField(null=True, default=datetime.now)

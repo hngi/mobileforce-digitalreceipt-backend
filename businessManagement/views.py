@@ -390,7 +390,7 @@ def upload_receipt_signature(request):
     if request.method == "PUT":
         try:
             receipt = Receipts.objects.get(id=request.data["receiptId"])
-            receipt.signature = request.FILES["signature"]
+            receipt.signature = request.data["signature"]
             receipt.save()
             receiptData = ReceiptSerializer(receipt)
             data = {
@@ -420,6 +420,10 @@ def create_business(request):
             data["slogan"] = request.data["slogan"]
         if "logo" in request.FILES:
             data["logo"] = request.FILES["logo"]
+        if "signature" in request.data:
+            data["signature"] = request.data["signature"]
+        if "currency" in request.data:
+            data["currency"] = request.data["currency"]
         serializer = BusinessInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -463,6 +467,10 @@ def update_business(request):
                 bus.slogan = request.data["slogan"]
             if "logo" in request.FILES:
                 bus.logo = request.FILES["logo"]
+            if "signature" in request.data:
+                bus.signature = request.data["signature"]
+            if "currency" in request.data:
+                bus.currency = request.data["currency"]
             bus.save()
             business = BusinessInfoSerializer(bus, many=False)
             return JsonResponse({"data": business.data}, status=status.HTTP_200_OK)
