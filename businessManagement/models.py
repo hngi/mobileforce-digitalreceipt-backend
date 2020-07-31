@@ -84,7 +84,7 @@ class BusinessInfo(models.Model):
     slogan = models.CharField(null=True, max_length=50)
     email_address = models.CharField(null=True, max_length=100)
     logo = models.FileField(null=True, upload_to=logo_directory_path)
-    user = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     signature=models.CharField(max_length=200000, null=True)
     currency=models.CharField(max_length=20, null=True)
 
