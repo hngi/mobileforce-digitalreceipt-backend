@@ -575,6 +575,10 @@ class UserAPIs(viewsets.GenericViewSet):
             'username': request.data['username'],
             'password': request.data['password']
         }
+        if "first_name" in request.data:
+            data['first_name']=request.data['first_name']
+        if "last_name" in request.data:
+            data['last_name']=request.data['last_name']
         # Creating user
         serialized = UserSerializer(data=data)
         if serialized.is_valid():
