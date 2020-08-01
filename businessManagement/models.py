@@ -32,6 +32,20 @@ class BusinessInfo(models.Model):
     currency=models.CharField(max_length=20, null=True)
 
 
+class BusinessInfo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(null=False, max_length=150)
+    phone_number = models.CharField(max_length=50, null=False)
+    address = models.CharField(max_length=200, null=False)
+    slogan = models.CharField(null=True, max_length=50)
+    email_address = models.CharField(null=True, max_length=100)
+    logo = models.FileField(null=True, upload_to=logo_directory_path)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    signature=models.CharField(max_length=200000, null=True)
+    currency=models.CharField(max_length=20, null=True)
+  
+
+
 class Receipts(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -55,7 +69,7 @@ class Receipts(models.Model):
     sellerName = models.CharField(max_length=120, null=True)
     customer = models.ForeignKey(CustomerDetails, on_delete=models.CASCADE, null=True)
     active = models.BooleanField(null=True, default=True)
-    business = models.ForeignKey(BusinessInfo, on_delete=models.CASCADE, null=True)
+    business=models.ForeignKey(BusinessInfo, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class Category(models.Model):

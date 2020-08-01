@@ -540,10 +540,6 @@ class UserAPIs(viewsets.GenericViewSet):
             return JsonResponse(
                 {"error": "Enter email address"}, status=status.HTTP_400_BAD_REQUEST
             )
-        if "username" not in request.data:
-            return JsonResponse(
-                {"error": "Enter name"}, status=status.HTTP_400_BAD_REQUEST
-            )
         if "password" not in request.data:
             return JsonResponse(
                 {"error": "Enter password"}, status=status.HTTP_400_BAD_REQUEST
@@ -572,7 +568,7 @@ class UserAPIs(viewsets.GenericViewSet):
         # Creating user
         data = {
             'email': request.data['email'],
-            'username': request.data['username'],
+            'username': request.data['email'],
             'password': request.data['password']
         }
         if "first_name" in request.data:
