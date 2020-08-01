@@ -83,11 +83,11 @@ def add_product_info_to_receipt(request):
 
 
 @api_view(["GET"])
-def get_all_receipt(request):
+def get_all_receipt(request,id):
     # send the receipt id
     if request.method == "GET":
         try:
-            recipt = Receipts.objects.filter(user=request.user_id, issued=True)
+            recipt = Receipts.objects.filter(user=request.user_id, issued=True,business=id)
             if recipt:
                 user = User.objects.get(id=request.user_id)
                 userData = UserSerializer(user, many=False).data
@@ -123,11 +123,11 @@ def get_all_receipt(request):
 
 
 @api_view(["GET"])
-def get_all_draft_receipt(request):
+def get_all_draft_receipt(request,id):
     # send the receipt id
     if request.method == "GET":
         try:
-            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False, active=True)
+            draftReceipt = Receipts.objects.filter(user=request.user_id, issued=False, active=True,business=id)
             if draftReceipt:
                 user = User.objects.get(id=request.user_id)
                 userData = UserSerializer(user, many=False).data
