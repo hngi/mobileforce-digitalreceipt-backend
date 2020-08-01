@@ -27,3 +27,4 @@ class UserTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserToken
         fields = '__all__'
+
