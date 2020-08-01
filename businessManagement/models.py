@@ -19,6 +19,18 @@ def logo_directory_path(instance, filename):
     img_extension = filename.split('.')[1]
     return 'logos/{0}.{1}'.format(instance.id, img_extension)
 
+class BusinessInfo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(null=False, max_length=150)
+    phone_number = models.CharField(max_length=50, null=False)
+    address = models.CharField(max_length=200, null=False)
+    slogan = models.CharField(null=True, max_length=50)
+    email_address = models.CharField(null=True, max_length=100)
+    logo = models.FileField(null=True, upload_to=logo_directory_path)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    signature=models.CharField(max_length=200000, null=True)
+    currency=models.CharField(max_length=20, null=True)
+
 
 class BusinessInfo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
