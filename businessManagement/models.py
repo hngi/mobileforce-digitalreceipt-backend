@@ -104,6 +104,7 @@ class Inventory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     tax_amount = models.FloatField(null=False, validators=[MinValueValidator(0)], default=Decimal('0.00'))
     discount = models.DecimalField(decimal_places=2, max_digits=10, default=Decimal('0.00'))
+    business = models.ForeignKey(BusinessInfo, on_delete=models.CASCADE, null= True)
 
 
 class Promotions(models.Model):
